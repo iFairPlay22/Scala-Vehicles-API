@@ -1,0 +1,157 @@
+{
+  "info": {
+    "_postman_id": "8ad2b9ad-4094-4ca3-942e-925c45bb3194",
+    "name": "Ewen-lunatech-data-ingestion-platform",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "21860688"
+  },
+  "item": [
+    {
+      "name": "Get all available vehicles",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://127.0.0.1:8080/api/vehicles/list",
+          "protocol": "http",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "vehicles",
+            "list"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get vehicle last position",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://127.0.0.1:8080/api/vehicles/vehicle/51/lastPosition",
+          "protocol": "http",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "vehicles",
+            "vehicle",
+            "51",
+            "lastPosition"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get filled tiles",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://127.0.0.1:8080/api/tiles/filled",
+          "protocol": "http",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "tiles",
+            "filled"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get available vehicles from tile",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://127.0.0.1:8080/api/tiles/tile/1_2/availableVehicles",
+          "protocol": "http",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "tiles",
+            "tile",
+            "1_2",
+            "availableVehicles"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Count available vehicles",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://127.0.0.1:8080/api/tiles/usecase/vehicleCount",
+          "protocol": "http",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "tiles",
+            "usecase",
+            "vehicleCount"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Client",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://127.0.0.1:3000/api",
+          "protocol": "http",
+          "host": [
+            "127",
+            "0",
+            "0",
+            "1"
+          ],
+          "port": "3000",
+          "path": [
+            "api"
+          ]
+        }
+      },
+      "response": []
+    }
+  ]
+}
