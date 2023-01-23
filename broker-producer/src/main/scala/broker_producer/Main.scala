@@ -24,8 +24,8 @@ object Main {
   // Scheduler
   final val brokerProducerScheduler: AppScheduler = new AppScheduler()
 
-  def main(args: Array[String]): Unit = {
-    StdIn.readLine()
+  def terminate(): Unit =
     brokerProducerProducer.terminate()
-  }
+
+  def main(args: Array[String]): Unit = {}
 }

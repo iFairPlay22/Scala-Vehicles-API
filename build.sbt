@@ -1,8 +1,7 @@
 // Projects
 lazy val global = (project in file("."))
-  .enablePlugins(DockerPlugin)
   .settings(
-    name := "sbt-multi-project-example",
+    name := "vehicles-api-root",
     scalaVersion := projectLibraryDependencies.scala.scalaVersion,
     libraryDependencies ++= globalLibraryDependencies,
     publish / skip := true
@@ -10,59 +9,71 @@ lazy val global = (project in file("."))
   .aggregate(domain, infra, brokerConsumer, brokerProducer, database, api)
   .dependsOn(domain, infra, brokerConsumer, brokerProducer, database, api)
 
-lazy val domain = (project in file("domain"))
-  .settings(
-    name := "domain",
-    scalaVersion := projectLibraryDependencies.scala.scalaVersion,
-    libraryDependencies ++= domainLibraryDependencies,
-    Compile / run / mainClass := Some("domain.Main")
-  )
-  .dependsOn()
-
-lazy val infra = (project in file("infra"))
-  .settings(
-    name := "infra",
-    scalaVersion := projectLibraryDependencies.scala.scalaVersion,
-    libraryDependencies ++= infraLibraryDependencies,
-    Compile / run / mainClass := Some("infra.Main")
-  )
-  .dependsOn(domain)
-
-lazy val brokerConsumer = (project in file("broker-consumer"))
-  .settings(
-    name := "broker-consumer",
-    scalaVersion := projectLibraryDependencies.scala.scalaVersion,
-    libraryDependencies ++= brokerConsumerLibraryDependencies,
-    Compile / run / mainClass := Some("broker_consumer.Main")
-  )
-  .dependsOn(domain, database)
-
-lazy val brokerProducer = (project in file("broker-producer"))
-  .settings(
-    name := "broker-producer",
-    scalaVersion := projectLibraryDependencies.scala.scalaVersion,
-    libraryDependencies ++= brokerProducerLibraryDependencies,
-    Compile / run / mainClass := Some("broker_producer.Main")
-  )
-  .dependsOn(domain, infra)
-
-lazy val database = (project in file("database"))
-  .settings(
-    name := "database",
-    scalaVersion := projectLibraryDependencies.scala.scalaVersion,
-    libraryDependencies ++= databaseLibraryDependencies,
-    Compile / run / mainClass := Some("database.Main")
-  )
-  .dependsOn(domain)
-
 lazy val api = (project in file("api"))
+  .enablePlugins(DockerPlugin)
   .settings(
     name := "api",
     scalaVersion := projectLibraryDependencies.scala.scalaVersion,
     libraryDependencies ++= apiLibraryDependencies,
-    Compile / run / mainClass := Some("api.Main")
+    Compile / run / mainClass := Some("api.Main"),
+    dockerExposedPorts ++= Seq(8080)
   )
   .dependsOn(domain, database)
+
+lazy val brokerConsumer = (project in file("broker-consumer"))
+  .enablePlugins(DockerPlugin)
+  .settings(
+    name := "broker-consumer",
+    scalaVersion := projectLibraryDependencies.scala.scalaVersion,
+    libraryDependencies ++= brokerConsumerLibraryDependencies,
+    Compile / run / mainClass := Some("broker_consumer.Main"),
+    dockerExposedPorts ++= Seq(8081)
+  )
+  .dependsOn(domain, database)
+
+lazy val brokerProducer = (project in file("broker-producer"))
+  .enablePlugins(DockerPlugin)
+  .settings(
+    name := "broker-producer",
+    scalaVersion := projectLibraryDependencies.scala.scalaVersion,
+    libraryDependencies ++= brokerProducerLibraryDependencies,
+    Compile / run / mainClass := Some("broker_producer.Main"),
+    dockerExposedPorts ++= Seq(8082)
+  )
+  .dependsOn(domain, infra)
+
+lazy val database = (project in file("database"))
+  .enablePlugins(DockerPlugin)
+  .settings(
+    name := "database",
+    scalaVersion := projectLibraryDependencies.scala.scalaVersion,
+    libraryDependencies ++= databaseLibraryDependencies,
+    Compile / run / mainClass := Some("database.Main"),
+    dockerExposedPorts ++= Seq(8083)
+  )
+  .dependsOn(domain)
+
+lazy val domain = (project in file("domain"))
+  .enablePlugins(DockerPlugin)
+  .settings(
+    name := "domain",
+    scalaVersion := projectLibraryDependencies.scala.scalaVersion,
+    libraryDependencies ++= domainLibraryDependencies,
+    Compile / run / mainClass := Some("domain.Main"),
+    dockerExposedPorts ++= Seq(8084)
+  )
+  .dependsOn()
+
+lazy val infra = (project in file("infra"))
+  .enablePlugins(DockerPlugin)
+  .settings(
+    name := "infra",
+    scalaVersion := projectLibraryDependencies.scala.scalaVersion,
+    libraryDependencies ++= infraLibraryDependencies,
+    Compile / run / mainClass := Some("infra.Main"),
+    dockerExposedPorts ++= Seq(8085)
+  )
+  .dependsOn(domain)
 
 // Library dependencies
 lazy val projectLibraryDependencies =
@@ -119,13 +130,16 @@ lazy val projectLibraryDependencies =
 
       val akkaHttpVersion      = "10.4.0"
       val akkaHttpCirceVersion = "1.39.2"
+      val akkaTestKitVersion   = "2.7.0"
 
       val akkaHttp        = "com.typesafe.akka" %% "akka-http"         % akkaHttpVersion
-      val akkaHttpTestkit = "com.typesafe.akka" %% "akka-http-testkit" % akkaHttpVersion % Test
+      val akkaTestKit     = "com.typesafe.akka" %% "akka-testkit"      % akkaTestKitVersion % Test
+      val akkaHttpTestkit = "com.typesafe.akka" %% "akka-http-testkit" % akkaHttpVersion    % Test
       val akkaCirceHttp   = "de.heikoseeberger" %% "akka-http-circe"   % akkaHttpCirceVersion
 
       val all = Seq(
         akkaHttp,
+        akkaTestKit,
         akkaHttpTestkit,
         akkaCirceHttp
       )

@@ -23,13 +23,10 @@ object Main {
   // Database
   database.Main.initDatabase()
 
-  def terminateConsumer(): Unit = {
+  def terminate(): Unit = {
     consumer.terminate()
-    database.Main.terminateDatabase()
+    database.Main.terminate()
   }
 
-  def main(args: Array[String]): Unit = {
-    StdIn.readLine()
-    terminateConsumer()
-  }
+  def main(args: Array[String]): Unit = {}
 }

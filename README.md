@@ -1,23 +1,43 @@
-# sbt-multi-project-example
+# Project
 
-The goal of this example is to provide a multi-project build using `sbt` providing:
-* A single `build.sbt` file which allows for centralized configuration, dependency and build management
-* Each sub-project contains only its source code
-* Sub-projects can depend on other sub-projects
-* Only *deliverable* sub-projects produce a *fat-jar* using [sbt-assembly](https://github.com/sbt/sbt-assembly)
+Simple project with Scala, Akka, Cassandra, Kafka and Circe. I divided the project into 6 modules to improve the scalability, security and performance.
 
-# Example structure
-* sbt-multi-project-example/
-    * common/
-        * src/
-        * test/
-    * multi1/
-        * src/
-        * test/
-    * multi2/
-        * src/
-        * test/
-    * project/
-        * build.properties
-        * plugins.sbt
-    * build.sbt
+## Setup the environment
+
+Launch the services:
+
+    docker-compose up
+
+Start the project:
+
+    sbt run
+
+## Interacting with the sample
+
+Create the database:
+
+    curl --location --request POST 'http://127.0.0.1:8080/init-db'
+
+Insert a person:
+
+    curl --location --request POST 'http://127.0.0.1:8080/person?name={PersonName}'
+
+Edit a person:
+
+    curl --location --request PUT 'http://127.0.0.1:8080/person/{PersonId}?name={PersonName}'
+
+Delete a person:
+
+    curl --location --request DELETE 'http://127.0.0.1:8080/person/{PersonId}'
+
+Get a user:
+
+    curl --location --request GET 'http://127.0.0.1:8080/person/{PersonId}'
+
+Get all the users:
+
+    curl --location --request GET 'http://127.0.0.1:8080/person'
+
+Ping google:
+
+    curl --location --request GET 'http://127.0.0.1:8080/http-request'

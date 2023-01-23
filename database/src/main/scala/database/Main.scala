@@ -23,11 +23,8 @@ object Main {
 
   def initDatabase(): Unit = {}
 
-  def terminateDatabase(): Unit =
+  def terminate(): Unit =
     databaseCassandraSession.close(databaseExecutionContext)
 
-  def main(args: Array[String]): Unit = {
-    StdIn.readLine()
-    terminateDatabase()
-  }
+  def main(args: Array[String]): Unit = {}
 }

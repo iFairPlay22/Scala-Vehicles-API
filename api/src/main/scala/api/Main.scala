@@ -34,13 +34,12 @@ object Main {
   // Database
   database.Main.initDatabase()
 
-  def terminateServer(): Future[Done] =
+  def init(): Future[Done] = Future(Done)
+
+  def terminate(): Future[Done] =
     apiServer
       .flatMap(_.unbind())
-      .andThen(_ => database.Main.terminateDatabase())
+      .andThen(_ => database.Main.terminate())
 
-  def main(args: Array[String]): Unit = {
-    StdIn.readLine()
-    terminateServer()
-  }
+  def main(args: Array[String]): Unit = {}
 }
