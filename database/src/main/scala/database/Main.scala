@@ -21,7 +21,7 @@ object Main {
   final implicit val databaseCassandraSession: CassandraSession =
     CassandraSessionRegistry.get(databaseSystem).sessionFor(CassandraSessionSettings())
 
-  def initDatabase(): Unit = {}
+  def init(): Unit = {}
 
   def terminate(): Unit =
     databaseCassandraSession.close(databaseExecutionContext)

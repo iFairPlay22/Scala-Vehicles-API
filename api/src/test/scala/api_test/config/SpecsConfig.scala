@@ -3,7 +3,7 @@ package api_test.config
 import akka.Done
 import database.repositories.VehicleRepository
 import database.throwables.DatabaseException
-import domain.vehicles.VehicleEntity
+import domain.data.vehicles.VehicleEntity
 import org.scalatest.time.SpanSugar.convertIntToGrainOfTime
 import api.Main._
 

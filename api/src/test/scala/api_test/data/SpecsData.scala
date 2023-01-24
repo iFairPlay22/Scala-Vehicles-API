@@ -1,25 +1,25 @@
 package api_test.data
 
 import api.controllers.responses.data.{ LatLongResponse, TileResponse, VehicleResponse }
-import domain.vehicles.VehicleEntity
+import domain.data.vehicles.VehicleEntity
 
 trait SpecsData {
 
   // Random vehicles
   val randomData1: (VehicleEntity, VehicleResponse, LatLongResponse, TileResponse) =
-    Random.randomVehicleDataWithSpecs(id = 1, latitude = 69.6516345, longitude = -18.9558585)
+    RandomData.randomVehicleDataWithSpecs(id = 1, latitude = 69.6516345, longitude = -18.9558585)
   val randomData2: (VehicleEntity, VehicleResponse, LatLongResponse, TileResponse) =
-    Random.randomVehicleDataWithSpecs(id = 2, latitude = 40.7127281, longitude = -74.0060152)
+    RandomData.randomVehicleDataWithSpecs(id = 2, latitude = 40.7127281, longitude = -74.0060152)
   val randomData3: (VehicleEntity, VehicleResponse, LatLongResponse, TileResponse) =
-    Random.randomVehicleDataWithSpecs(id = 3, latitude = 39.906217, longitude = 116.3912757)
+    RandomData.randomVehicleDataWithSpecs(id = 3, latitude = 39.906217, longitude = 116.3912757)
   val randomData4: (VehicleEntity, VehicleResponse, LatLongResponse, TileResponse) =
-    Random.randomVehicleDataWithSpecs(
+    RandomData.randomVehicleDataWithSpecs(
       id        = 4,
       latitude  = randomData3._3.latitude,
       longitude = randomData3._3.longitude
     ) // same position as randomData3
   val randomData5: (VehicleEntity, VehicleResponse, LatLongResponse, TileResponse) =
-    Random.randomVehicleDataWithSpecs(
+    RandomData.randomVehicleDataWithSpecs(
       id        = randomData2._2.id,
       latitude  = 22.9110137,
       longitude = 43.2093727

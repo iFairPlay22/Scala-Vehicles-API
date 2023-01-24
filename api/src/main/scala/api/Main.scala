@@ -8,7 +8,8 @@ import akka.http.scaladsl.server.Route
 import api.controllers.VehicleController
 import com.typesafe.config.Config
 
-import scala.concurrent.{ ExecutionContextExecutor, Future }
+import scala.concurrent.duration.Duration
+import scala.concurrent.{ Await, ExecutionContextExecutor, Future }
 import scala.io.StdIn
 
 object Main {
@@ -32,7 +33,7 @@ object Main {
     .bind(Route.seal(VehicleController.routes))
 
   // Database
-  database.Main.initDatabase()
+  database.Main.init()
 
   def init(): Future[Done] = Future(Done)
 
@@ -41,5 +42,11 @@ object Main {
       .flatMap(_.unbind())
       .andThen(_ => database.Main.terminate())
 
-  def main(args: Array[String]): Unit = {}
+  def main(args: Array[String]): Unit = {
+    StdIn.readLine()
+    Await.ready(
+      terminate(),
+      Duration.Inf
+    )
+  }
 }

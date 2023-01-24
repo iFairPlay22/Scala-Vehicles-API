@@ -1,11 +1,12 @@
 package broker_consumer
-
+import akka.Done
 import akka.actor.ActorSystem
 import akka.event.Logging
 import broker_consumer.consumers.vehicles.VehicleBrokerConsumer
-import com.typesafe.config.{ Config, ConfigFactory }
+import com.typesafe.config.Config
 
-import scala.concurrent.ExecutionContextExecutor
+import scala.concurrent.duration.Duration
+import scala.concurrent.{ Await, ExecutionContextExecutor, Future }
 import scala.io.StdIn
 
 object Main {
@@ -21,12 +22,16 @@ object Main {
   final val consumer: VehicleBrokerConsumer = new VehicleBrokerConsumer()
 
   // Database
-  database.Main.initDatabase()
+  database.Main.init()
 
-  def terminate(): Unit = {
-    consumer.terminate()
-    database.Main.terminate()
+  def terminate(): Future[Done] =
+    consumer.terminate().andThen(_ => database.Main.terminate())
+
+  def main(args: Array[String]): Unit = {
+    StdIn.readLine()
+    Await.ready(
+      terminate(),
+      Duration.Inf
+    )
   }
-
-  def main(args: Array[String]): Unit = {}
 }

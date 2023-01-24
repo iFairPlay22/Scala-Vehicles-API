@@ -8,7 +8,7 @@ import akka.Done
 import broker_producer.Main.{ brokerProducerConfig, brokerProducerLogger }
 import broker_producer.producers.BrokerProducerImpl
 import broker_producer.throwables.BrokerProducerException
-import domain.vehicles.VehicleEntity
+import domain.data.vehicles.VehicleEntity
 import org.apache.kafka.clients.producer.RecordMetadata
 
 import scala.concurrent.Future
@@ -17,7 +17,9 @@ class VehicleBrokerProducer extends BrokerProducerImpl[Long, List[VehicleEntity]
 
   val topic: String = brokerProducerConfig.getString("broker_producer.topic")
 
-  def produce(vehicles: List[VehicleEntity]): Future[Either[BrokerProducerException, RecordMetadata]] = {
+  def produce(
+      vehicles: List[VehicleEntity]
+  ): Future[Either[BrokerProducerException, RecordMetadata]] = {
 
     val key: Long                  = System.currentTimeMillis()
     val value: List[VehicleEntity] = vehicles

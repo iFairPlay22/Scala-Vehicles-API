@@ -1,6 +1,6 @@
-package domain.positions
+package domain.data.positions
 
-import domain.Entity
+import domain.data.Entity
 
 case class PixelsEntity(pixelX: Int, pixelY: Int) extends Entity {
   require(0 <= pixelX, "pixel x must be positive or zero")

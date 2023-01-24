@@ -1,6 +1,6 @@
 package api.services.map
 
-import domain.positions.{ LatLongEntity, PixelsEntity, QuadKeyEntity, TilesEntity }
+import domain.data.positions.{ LatLongEntity, PixelsEntity, QuadKeyEntity, TilesEntity }
 
 import scala.collection.mutable
 

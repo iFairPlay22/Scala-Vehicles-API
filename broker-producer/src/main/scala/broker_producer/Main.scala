@@ -1,12 +1,14 @@
 package broker_producer
 
+import akka.Done
 import akka.actor.ActorSystem
 import akka.event.Logging
 import broker_producer.producers.vehicles.VehicleBrokerProducer
 import broker_producer.schedulers.AppScheduler
 import com.typesafe.config.{ Config, ConfigFactory }
 
-import scala.concurrent.ExecutionContextExecutor
+import scala.concurrent.{ Await, ExecutionContextExecutor, Future }
+import scala.concurrent.duration.Duration
 import scala.io.StdIn
 
 object Main {
@@ -24,8 +26,16 @@ object Main {
   // Scheduler
   final val brokerProducerScheduler: AppScheduler = new AppScheduler()
 
-  def terminate(): Unit =
-    brokerProducerProducer.terminate()
+  def terminate(): Future[Done] =
+    Future(Done)
+      .andThen(_ => brokerProducerScheduler.terminate())
+      .andThen(_ => brokerProducerProducer.terminate())
 
-  def main(args: Array[String]): Unit = {}
+  def main(args: Array[String]): Unit = {
+    StdIn.readLine()
+    Await.ready(
+      terminate(),
+      Duration.Inf
+    )
+  }
 }

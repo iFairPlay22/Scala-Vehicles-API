@@ -1,10 +1,19 @@
 package broker_consumer.consumers
 
+import io.circe._
+import io.circe.generic.auto._
+import io.circe.parser._
+import io.circe.syntax._
 import akka.Done
 import akka.kafka.scaladsl.Consumer
 import akka.kafka.{ ConsumerSettings, Subscriptions }
-import akka.stream.scaladsl.Source
-import broker_consumer.Main.{ brokerConsumerConfig, brokerConsumerLogger }
+import akka.stream.scaladsl.{ Keep, Sink, Source }
+import broker_consumer.Main.{
+  brokerConsumerConfig,
+  brokerConsumerExecutionContext,
+  brokerConsumerLogger,
+  brokerConsumerSystem
+}
 import broker_consumer.throwables.{
   BrokerConsumerException,
   UnableToConsumeInBrokerConsumerException,
@@ -18,22 +27,28 @@ import org.apache.kafka.common.serialization.StringDeserializer
 
 import scala.concurrent.Future
 
-abstract class BrokerConsumerImpl[K: Decoder, V: Decoder] extends BrokerConsumer {
+abstract class BrokerConsumerImpl[K: Decoder, V: Decoder](
+    topic: String,
+    callbacks: Set[Either[BrokerConsumerException, (K, V)] => Future[Done]]
+) extends BrokerConsumer {
 
-  val topic: String
-  val callbacks: Set[Either[BrokerConsumerException, (K, V)] => Future[Done]]
+  assert(topic != null && topic.nonEmpty)
+  assert(callbacks != null && callbacks.nonEmpty)
 
   final val config: Config = brokerConsumerConfig.getConfig("akka.kafka.consumer")
 
   final val settings: ConsumerSettings[String, String] =
     ConsumerSettings(config, new StringDeserializer, new StringDeserializer)
 
-  final val consumer: Source[Done, Consumer.Control] = Consumer
+  val (consumerControl, streamComplete) = Consumer
     .plainSource(
       settings,
       Subscriptions.topics(topic)
     )
-    .flatMapConcat { record =>
+    .mapAsync(1) { record =>
+      brokerConsumerLogger.info(
+        f"[BrokerConsumerImpl]: fzrfer..."
+      )
       Source(callbacks)
         .mapAsync(3) { callback =>
           brokerConsumerLogger.info(
@@ -54,11 +69,18 @@ abstract class BrokerConsumerImpl[K: Decoder, V: Decoder] extends BrokerConsumer
             case Left(_) => callback(Left(new UnableToDecodeKeyInBrokerConsumerException()))
           }
         }
+        .run()
     }
-    .recover { _ =>
+    .recover { error =>
+      brokerConsumerLogger.error(f"[BrokerConsumerImpl]: Failed to load broker!", error)
       throw new UnableToConsumeInBrokerConsumerException()
     }
+    .toMat(Sink.ignore)(Keep.both)
+    .run()
 
-  def terminate(): Unit = {}
+  brokerConsumerLogger.info(f"[BrokerConsumerImpl]: Broker is running in topic $topic!")
+
+  def terminate(): Future[Done] =
+    consumerControl.shutdown()
 
 }

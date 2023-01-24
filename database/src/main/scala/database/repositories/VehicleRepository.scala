@@ -17,8 +17,8 @@ import database.Main.{
   databaseLogger,
   databaseSystem
 }
-import domain.positions.LatLongEntity
-import domain.vehicles.VehicleEntity
+import domain.data.positions.LatLongEntity
+import domain.data.vehicles.VehicleEntity
 
 import scala.collection.immutable
 import scala.concurrent.Future
@@ -77,7 +77,9 @@ object VehicleRepository extends Repository {
         Left(new UnableToTruncateTableInDatabaseException())
       }
 
-  def insertOrEdit(vehicle: VehicleEntity): Future[Either[UnableToInsertOrEditVehicleInDatabaseException, Done]] =
+  def insertOrEdit(
+      vehicle: VehicleEntity
+  ): Future[Either[UnableToInsertOrEditVehicleInDatabaseException, Done]] =
     queryToEmptyResult(
       updateVehicleByIdQuery(),
       List(
@@ -116,7 +118,9 @@ object VehicleRepository extends Repository {
         Left(new UnableToSelectAllVehicleInDatabaseException())
       }
 
-  def selectOne(id: Int): Future[Either[UnableToSelectOneVehicleInDatabaseException, Option[VehicleEntity]]] =
+  def selectOne(
+      id: Int
+  ): Future[Either[UnableToSelectOneVehicleInDatabaseException, Option[VehicleEntity]]] =
     queryToOptionalSingleResult(
       selectOneQuery(),
       List(id),

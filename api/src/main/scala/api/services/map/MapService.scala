@@ -1,6 +1,6 @@
 package api.services.map
 
-import domain.positions.{ LatLongEntity, QuadKeyEntity, TilesEntity }
+import domain.data.positions.{ LatLongEntity, QuadKeyEntity, TilesEntity }
 
 object MapService {
 

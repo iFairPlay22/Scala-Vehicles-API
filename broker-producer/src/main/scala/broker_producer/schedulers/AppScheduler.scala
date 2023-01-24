@@ -21,23 +21,19 @@ class AppScheduler() {
   final val DATA_INGESTION_REFRESH_DELAY =
     brokerProducerConfig.getInt("broker_producer.scheduler.refresh-delay-seconds").seconds;
 
-  def run(): Cancellable = {
+  final val scheduler: Cancellable = {
     brokerProducerLogger.info("[AppScheduler]: Initializing tasks in producer")
 
     brokerProducerSystem.scheduler
       // Every 30 seconds, we call the external API to get the vehicles, and we produce dedicated kafka events
       .scheduleAtFixedRate(DATA_INGESTION_INITIAL_DELAY, DATA_INGESTION_REFRESH_DELAY) { () =>
         Future {}
-          .map { _ =>
-            brokerProducerLogger.info("[AppScheduler]: ------------------------------------------")
+          .andThen { _ =>
             brokerProducerLogger.info("[AppScheduler]: Starting data injection task in producer")
-            brokerProducerLogger.info("[AppScheduler]: -----------------------------------------")
           }
           .flatMap(_ => produceApiVehiclesToBroker())
-          .map { _ =>
-            brokerProducerLogger.info("[AppScheduler]: ------------------------------------------")
+          .andThen { _ =>
             brokerProducerLogger.info("[AppScheduler]: Ending data injection task in producer")
-            brokerProducerLogger.info("[AppScheduler]: ------------------------------------------")
           }
       }
   }
@@ -46,7 +42,11 @@ class AppScheduler() {
     for {
       eitherErrorOrVehicles <- VehicleProvider.getVehicles()
       eitherErrorOrProduction <- eitherErrorOrVehicles match {
-        case Right(vehicles) => brokerProducerProducer.produce(vehicles)
+        case Right(vehicles) =>
+          brokerProducerLogger.info(
+            "[AppScheduler]: Successfully got vehicles from VehicleProvider"
+          )
+          brokerProducerProducer.produce(vehicles)
         case Left(error) =>
           Future {
             brokerProducerLogger.error(
@@ -58,10 +58,15 @@ class AppScheduler() {
       }
     } yield {
       eitherErrorOrProduction match {
-        case Right(_) => Done
+        case Right(_) =>
+          brokerProducerLogger.info("[AppScheduler]: Successfully produced in topic")
+          Done
         case Left(error) =>
           brokerProducerLogger.error("[AppScheduler] Can not produce vehicles in producer!", error)
           Done
       }
     }
+
+  def terminate(): Unit =
+    scheduler.cancel()
 }

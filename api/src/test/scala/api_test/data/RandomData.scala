@@ -2,23 +2,17 @@ package api_test.data
 
 import api.controllers.responses.data.{ LatLongResponse, TileResponse, VehicleResponse }
 import api.services.map.TileSystem
-import domain.positions.LatLongEntity
-import domain.vehicles.VehicleEntity
+import domain.data.positions.LatLongEntity
+import domain.data.vehicles.VehicleEntity
+import domain.util.RandomUtils
 
-object Random {
-
-  val rand = new scala.util.Random
-
-  def randomInt(start: Int = 0, end: Int = Int.MaxValue): Int =
-    rand.between(start, end)
-
-  def randomBool(): Boolean = rand.nextBoolean()
+object RandomData {
 
   def randomVehicleData(
       id: Int
   ): (VehicleEntity, VehicleResponse, LatLongResponse, TileResponse) = {
-    val latitude  = randomInt(start = 0, end = 90)
-    val longitude = randomInt(start = -180, end = 180)
+    val latitude  = RandomUtils.randomInt(start = 0, end = 90)
+    val longitude = RandomUtils.randomInt(start = -180, end = 180)
     randomVehicleDataWithSpecs(id, latitude, longitude)
   }
 
@@ -27,11 +21,11 @@ object Random {
       latitude: Double,
       longitude: Double
   ): (VehicleEntity, VehicleResponse, LatLongResponse, TileResponse) = {
-    val routeId            = randomInt()
-    val runId              = randomInt()
-    val heading            = randomInt()
-    val predictable        = randomBool()
-    val secondsSinceReport = randomInt()
+    val routeId            = RandomUtils.randomInt()
+    val runId              = RandomUtils.randomInt()
+    val heading            = RandomUtils.randomInt()
+    val predictable        = RandomUtils.randomBool()
+    val secondsSinceReport = RandomUtils.randomInt()
     val tilesEntity =
       TileSystem.pixelXYToTileXY(TileSystem.latLongToPixelXY(LatLongEntity(latitude, longitude)))
     (

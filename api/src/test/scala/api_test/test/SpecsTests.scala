@@ -16,7 +16,7 @@ import api.controllers.responses.data.{
   VehicleAmountOfTileResponse,
   VehicleResponse
 }
-import domain.vehicles.VehicleEntity
+import domain.data.vehicles.VehicleEntity
 import io.circe.Decoder
 import io.circe.parser.decode
 import io.circe._

@@ -1,8 +1,11 @@
 package api.controllers.mappers
 
-import api.controllers.responses.{ GetAvailableVehiclesInTileResponse, GetAvailableVehiclesResponse }
+import api.controllers.responses.{
+  GetAvailableVehiclesInTileResponse,
+  GetAvailableVehiclesResponse
+}
 import api.controllers.responses.data.VehicleResponse
-import domain.vehicles.VehicleEntity
+import domain.data.vehicles.VehicleEntity
 
 object VehicleResponseMapper {
 

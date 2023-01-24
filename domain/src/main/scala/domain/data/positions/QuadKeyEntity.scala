@@ -1,6 +1,6 @@
-package domain.positions
+package domain.data.positions
 
-import domain.Entity
+import domain.data.Entity
 
 case class QuadKeyEntity(value: String) extends Entity {
 

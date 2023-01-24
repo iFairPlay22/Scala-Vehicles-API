@@ -1,6 +1,6 @@
-package domain.positions
+package domain.data.positions
 
-import domain.Entity
+import domain.data.Entity
 
 case class LatLongEntity(latitude: Double, longitude: Double) extends Entity {
   require(0 <= latitude && latitude <= 90, "vehicle latitude must be between 0 and 90")

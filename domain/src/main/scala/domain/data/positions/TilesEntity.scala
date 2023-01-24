@@ -1,7 +1,6 @@
-package domain.positions
+package domain.data.positions
 
-import domain.Entity
-
+import domain.data.Entity
 import scala.collection.mutable
 
 case class TilesEntity(tileX: Int, tileY: Int) extends Entity {

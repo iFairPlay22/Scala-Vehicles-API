@@ -4,13 +4,13 @@ Simple project with Scala, Akka, Cassandra, Kafka and Circe. I divided the proje
 
 ## Setup the environment
 
+Generate the docker images:
+
+    sbt docker:publishLocal
+
 Launch the services:
 
     docker-compose up
-
-Start the project:
-
-    sbt run
 
 ## Interacting with the sample
 

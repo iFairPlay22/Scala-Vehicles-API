@@ -1,7 +1,7 @@
-package domain.vehicles
+package domain.data.vehicles
 
-import domain.Entity
-import domain.positions.LatLongEntity
+import domain.data.Entity
+import domain.data.positions.LatLongEntity
 
 case class VehicleEntity(
     id: Int,

@@ -7,7 +7,7 @@ import io.circe._
 import akka.http.scaladsl.common.{ EntityStreamingSupport, JsonEntityStreamingSupport }
 import akka.http.scaladsl.model.{ HttpRequest, HttpResponse }
 import akka.http.scaladsl.unmarshalling.Unmarshal
-import domain.vehicles.VehicleEntity
+import domain.data.vehicles.VehicleEntity
 import infra.requests.vehicles.VehicleDictRequest
 import infra.Main.{ infraConfig, infraExecutionContext, infraLogger, infraServer, infraSystem }
 import infra.mappers.VehicleRequestMapper
@@ -22,7 +22,8 @@ import scala.concurrent.Future
 
 object VehicleProvider extends Providers {
 
-  final implicit val jsonStreamingSupport: JsonEntityStreamingSupport = EntityStreamingSupport.json()
+  final implicit val jsonStreamingSupport: JsonEntityStreamingSupport =
+    EntityStreamingSupport.json()
 
   final val VEHICLES_API_HOST: String  = infraConfig.getString("infra.vehicles-api.host")
   final val VEHICLES_API_PORT: String  = infraConfig.getString("infra.vehicles-api.port")
@@ -48,9 +49,9 @@ object VehicleProvider extends Providers {
                 .to[String]
                 .map(json => Right(json))
             else
-              Future { Left(new UnableToGetVehiclesDataFromInfraException()) }
+              Future(Left(new UnableToGetVehiclesDataFromInfraException()))
           }
-          case Left(error) => Future { Left(error) }
+          case Left(error) => Future(Left(error))
         }
       }
     } yield {
@@ -59,8 +60,9 @@ object VehicleProvider extends Providers {
         case Right(json) => {
           val eitherErrorOrVehicles = decode[VehicleDictRequest](json)
           eitherErrorOrVehicles match {
-            case Right(vehiclesDict) => Right(vehiclesDict.vehicles.map(VehicleRequestMapper.inputToEntity))
-            case Left(error)         => Left(new UnableToParseVehiclesDataFromIntraException())
+            case Right(vehiclesDict) =>
+              Right(vehiclesDict.vehicles.map(VehicleRequestMapper.inputToEntity))
+            case Left(error) => Left(new UnableToParseVehiclesDataFromIntraException())
           }
         }
         case Left(error) => Left(error)

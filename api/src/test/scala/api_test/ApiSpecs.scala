@@ -12,7 +12,7 @@ import api_test.test.SpecsTests
 import scala.concurrent.duration.Duration
 import scala.concurrent.Await
 
-class AppSpecs
+class ApiSpecs
     extends AnyWordSpecLike
     with Matchers
     with BeforeAndAfterAll

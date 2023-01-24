@@ -1,7 +1,7 @@
 package infra.mappers
 
-import domain.positions.LatLongEntity
-import domain.vehicles.VehicleEntity
+import domain.data.positions.LatLongEntity
+import domain.data.vehicles.VehicleEntity
 import infra.requests.vehicles.VehicleRequest
 
 object VehicleRequestMapper extends RequestMapper {
