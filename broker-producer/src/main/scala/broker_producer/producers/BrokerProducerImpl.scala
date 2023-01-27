@@ -23,9 +23,13 @@ import org.apache.kafka.common.serialization.StringSerializer
 
 import scala.concurrent.Future
 
-abstract class BrokerProducerImpl[K: Encoder, V: Encoder] extends BrokerProducer {
+abstract class BrokerProducerImpl[K: Encoder, V: Encoder](
+    topic: String
+) extends BrokerProducer {
 
-  val topic: String
+  assert(topic != null && topic.nonEmpty)
+
+  brokerProducerLogger.info(f"[BrokerConsumerImpl]: Running broker in topic $topic!")
 
   final val config: Config = brokerProducerConfig.getConfig("app.kafka.producer")
 
@@ -52,7 +56,10 @@ abstract class BrokerProducerImpl[K: Encoder, V: Encoder] extends BrokerProducer
         )
       )
       .map(record => Right(record))
-      .recover(_ => Left(new UnableToProduceInBrokerProducerException()))
+      .recover { error =>
+        brokerProducerLogger.error(f"[BrokerProducerImpl]: Failed to produce in broker!", error)
+        Left(new UnableToProduceInBrokerProducerException())
+      }
   }
 
   def terminate(): Unit =

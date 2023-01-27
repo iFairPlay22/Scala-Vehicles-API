@@ -35,6 +35,8 @@ abstract class BrokerConsumerImpl[K: Decoder, V: Decoder](
   assert(topic != null && topic.nonEmpty)
   assert(callbacks != null && callbacks.nonEmpty)
 
+  brokerConsumerLogger.info(f"[BrokerConsumerImpl]: Running broker in topic $topic!")
+
   final val config: Config = brokerConsumerConfig.getConfig("akka.kafka.consumer")
 
   final val settings: ConsumerSettings[String, String] =
@@ -46,9 +48,6 @@ abstract class BrokerConsumerImpl[K: Decoder, V: Decoder](
       Subscriptions.topics(topic)
     )
     .mapAsync(1) { record =>
-      brokerConsumerLogger.info(
-        f"[BrokerConsumerImpl]: fzrfer..."
-      )
       Source(callbacks)
         .mapAsync(3) { callback =>
           brokerConsumerLogger.info(
@@ -77,8 +76,6 @@ abstract class BrokerConsumerImpl[K: Decoder, V: Decoder](
     }
     .toMat(Sink.ignore)(Keep.both)
     .run()
-
-  brokerConsumerLogger.info(f"[BrokerConsumerImpl]: Broker is running in topic $topic!")
 
   def terminate(): Future[Done] =
     consumerControl.shutdown()

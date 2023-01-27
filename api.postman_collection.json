@@ -31,7 +31,7 @@
       "response": []
     },
     {
-      "name": "Get vehicle last position",
+      "name": "Get vehicle last position by vehicle_id",
       "request": {
         "method": "GET",
         "header": [],
@@ -57,7 +57,7 @@
       "response": []
     },
     {
-      "name": "Get filled tiles",
+      "name": "Get all filled tiles",
       "request": {
         "method": "GET",
         "header": [],
@@ -81,7 +81,7 @@
       "response": []
     },
     {
-      "name": "Get available vehicles from tile",
+      "name": "Get available vehicles from tile_id",
       "request": {
         "method": "GET",
         "header": [],
@@ -107,7 +107,7 @@
       "response": []
     },
     {
-      "name": "Count available vehicles",
+      "name": "Count available vehicles per tile",
       "request": {
         "method": "GET",
         "header": [],

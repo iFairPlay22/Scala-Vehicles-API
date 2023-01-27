@@ -1,6 +1,6 @@
 # Project
 
-Simple project with Scala, Akka, Cassandra, Kafka and Circe. I divided the project into 6 modules to improve the scalability, security and performance.
+Simple project with Scala, Akka, Cassandra, Kafka and Circe. I divided the project into 6 modules to have a better scalability, maintenance and performance.
 
 ## Setup the environment
 
@@ -8,36 +8,38 @@ Generate the docker images:
 
     sbt docker:publishLocal
 
+Set the deployment version (ex: 0.1.0-SNAPSHOT):
+
+    export VERSION=0.1.0-SNAPSHOT
+
 Launch the services:
 
     docker-compose up
 
 ## Interacting with the sample
 
-Create the database:
+### Postman
 
-    curl --location --request POST 'http://127.0.0.1:8080/init-db'
+You can test the endpoints by using the postman collection `api.postman_collection.json`. You can directly import it into Postman.
 
-Insert a person:
+### Endpoints
 
-    curl --location --request POST 'http://127.0.0.1:8080/person?name={PersonName}'
+Get all available vehicles:
 
-Edit a person:
+    curl --location --request GET 'http://127.0.0.1:8080/api/vehicles/list'
 
-    curl --location --request PUT 'http://127.0.0.1:8080/person/{PersonId}?name={PersonName}'
+Get vehicle last position by vehicle_id (ex: vehicle_id=1):
 
-Delete a person:
+    curl --location --request GET 'http://127.0.0.1:8080/api/vehicles/vehicle/1/lastPosition'
 
-    curl --location --request DELETE 'http://127.0.0.1:8080/person/{PersonId}'
+Get all filled tiles:
 
-Get a user:
+    curl --location --request GET 'http://127.0.0.1:8080/api/tiles/filled'
 
-    curl --location --request GET 'http://127.0.0.1:8080/person/{PersonId}'
+Get available vehicles from tile_id (ex: tile_id=1_1):
 
-Get all the users:
+    curl --location --request GET 'http://127.0.0.1:8080/api/tiles/tile/1_1/availableVehicles'
 
-    curl --location --request GET 'http://127.0.0.1:8080/person'
+Count available vehicles per tile:
 
-Ping google:
-
-    curl --location --request GET 'http://127.0.0.1:8080/http-request'
+    curl --location --request GET 'hhttp://127.0.0.1:8080/api/tiles/usecase/vehicleCount'

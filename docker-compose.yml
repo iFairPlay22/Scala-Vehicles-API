@@ -32,8 +32,6 @@ services:
   zookeeper:
     image: confluentinc/cp-zookeeper:latest
     container_name: zookeeper
-    ports:
-      - "2181:2181"
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
@@ -43,18 +41,11 @@ services:
     container_name: broker
     depends_on:
       - zookeeper
-    ports:
-      - "9092:9092"
-    expose:
-      - '29092'
     environment:
       KAFKA_BROKER_ID: 1
-      KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_INTERNAL:PLAINTEXT
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092,PLAINTEXT_INTERNAL://broker:29092
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://broker:9092
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
-      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
 
   broker-init:
     image: confluentinc/cp-kafka:latest
@@ -64,11 +55,59 @@ services:
     command: |
       "
       # blocks until kafka is reachable
-      kafka-topics --bootstrap-server broker:29092 --list
+      kafka-topics --bootstrap-server broker:9092 --list
       
       echo -e 'Creating kafka topics'
-      kafka-topics --bootstrap-server broker:29092 --create --if-not-exists --topic vehicles --replication-factor 1 --partitions 1
+      kafka-topics --bootstrap-server broker:9092 --create --if-not-exists --topic vehicles --replication-factor 1 --partitions 1
       
       echo -e 'Successfully created the following topics:'
-      kafka-topics --bootstrap-server broker:29092 --list
+      kafka-topics --bootstrap-server broker:9092 --list
       "
+
+
+  vehicles-api:
+    image: vehicles-api:${VERSION}
+    networks:
+      - default
+    environment:
+      VEHICLE_API_PORT: 8080
+    entrypoint:
+      - bash
+      - -c
+      - |
+        while ! bash -c "echo > /dev/tcp/cassandra/9042" 2> /dev/null; do sleep 1; done
+        /opt/docker/bin/vehicles-api
+    depends_on:
+      - cassandra
+      - cassandra-init
+
+  vehicles-broker-producer:
+    image: vehicles-broker-producer:${VERSION}
+    networks:
+      - default
+    entrypoint:
+      - bash
+      - -c
+      - |
+        while ! bash -c "echo > /dev/tcp/broker/9092" 2> /dev/null; do sleep 1; done
+        /opt/docker/bin/vehicles-broker-producer
+    depends_on:
+      - broker
+      - broker-init
+
+  vehicles-broker-consumer:
+    image: vehicles-broker-consumer:${VERSION}
+    networks:
+      - default
+    entrypoint:
+      - bash
+      - -c
+      - |
+        while ! bash -c "echo > /dev/tcp/cassandra/9042" 2> /dev/null; do sleep 1; done
+        while ! bash -c "echo > /dev/tcp/broker/9092" 2> /dev/null; do sleep 1; done
+        /opt/docker/bin/vehicles-broker-consumer
+    depends_on:
+      - cassandra
+      - cassandra-init
+      - broker
+      - broker-init

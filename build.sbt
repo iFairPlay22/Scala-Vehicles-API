@@ -1,7 +1,7 @@
 // Projects
 lazy val global = (project in file("."))
   .settings(
-    name := "vehicles-api-root",
+    name := "vehicles-project-root",
     scalaVersion := projectLibraryDependencies.scala.scalaVersion,
     libraryDependencies ++= globalLibraryDependencies,
     publish / skip := true
@@ -10,76 +10,78 @@ lazy val global = (project in file("."))
   .dependsOn(domain, infra, brokerConsumer, brokerProducer, database, api)
 
 lazy val api = (project in file("api"))
-  .enablePlugins(DockerPlugin)
+  .enablePlugins(DockerPlugin, JavaAppPackaging)
+  .settings(dockerSettings: _*)
   .settings(
-    name := "api",
+    name := "vehicles-api",
     scalaVersion := projectLibraryDependencies.scala.scalaVersion,
     libraryDependencies ++= apiLibraryDependencies,
     Compile / run / mainClass := Some("api.Main"),
-    dockerExposedPorts ++= Seq(8080)
+    Docker / packageName := "vehicles-api"
   )
   .dependsOn(domain, database)
 
 lazy val brokerConsumer = (project in file("broker-consumer"))
-  .enablePlugins(DockerPlugin)
+  .enablePlugins(DockerPlugin, JavaAppPackaging)
+  .settings(dockerSettings: _*)
   .settings(
-    name := "broker-consumer",
+    name := "vehicles-broker-consumer",
     scalaVersion := projectLibraryDependencies.scala.scalaVersion,
     libraryDependencies ++= brokerConsumerLibraryDependencies,
     Compile / run / mainClass := Some("broker_consumer.Main"),
-    dockerExposedPorts ++= Seq(8081)
+    Docker / packageName := "vehicles-broker-consumer"
   )
   .dependsOn(domain, database)
 
 lazy val brokerProducer = (project in file("broker-producer"))
-  .enablePlugins(DockerPlugin)
+  .enablePlugins(DockerPlugin, JavaAppPackaging)
+  .settings(dockerSettings: _*)
   .settings(
-    name := "broker-producer",
+    name := "vehicles-broker-producer",
     scalaVersion := projectLibraryDependencies.scala.scalaVersion,
     libraryDependencies ++= brokerProducerLibraryDependencies,
     Compile / run / mainClass := Some("broker_producer.Main"),
-    dockerExposedPorts ++= Seq(8082)
+    Docker / packageName := "vehicles-broker-producer"
   )
   .dependsOn(domain, infra)
 
 lazy val database = (project in file("database"))
-  .enablePlugins(DockerPlugin)
   .settings(
-    name := "database",
+    name := "vehicles-database",
     scalaVersion := projectLibraryDependencies.scala.scalaVersion,
     libraryDependencies ++= databaseLibraryDependencies,
-    Compile / run / mainClass := Some("database.Main"),
-    dockerExposedPorts ++= Seq(8083)
+    Compile / run / mainClass := Some("database.Main")
   )
   .dependsOn(domain)
 
 lazy val domain = (project in file("domain"))
-  .enablePlugins(DockerPlugin)
   .settings(
-    name := "domain",
+    name := "vehicles-domain",
     scalaVersion := projectLibraryDependencies.scala.scalaVersion,
     libraryDependencies ++= domainLibraryDependencies,
-    Compile / run / mainClass := Some("domain.Main"),
-    dockerExposedPorts ++= Seq(8084)
+    Compile / run / mainClass := Some("domain.Main")
   )
   .dependsOn()
 
 lazy val infra = (project in file("infra"))
-  .enablePlugins(DockerPlugin)
   .settings(
-    name := "infra",
+    name := "vehicles-infra",
     scalaVersion := projectLibraryDependencies.scala.scalaVersion,
     libraryDependencies ++= infraLibraryDependencies,
-    Compile / run / mainClass := Some("infra.Main"),
-    dockerExposedPorts ++= Seq(8085)
+    Compile / run / mainClass := Some("infra.Main")
   )
   .dependsOn(domain)
+
+// Docker plugin settings
+lazy val dockerSettings = Seq(
+  dockerBaseImage := "openjdk:11"
+)
 
 // Library dependencies
 lazy val projectLibraryDependencies =
   new {
     val scala = new {
-      val scalaVersion        = "2.13.4"
+      val scalaVersion        = "2.13.10"
       val scalaLoggingVersion = "3.9.5"
       val scalaTestVersion    = "3.2.15"
 
@@ -93,6 +95,7 @@ lazy val projectLibraryDependencies =
     }
 
     val java = new {
+      val javaVersion           = "11.0.15"
       val javaDriverCoreVersion = "4.15.0"
 
       val javaDriverCore = "com.datastax.oss" % "java-driver-core" % "4.15.0"

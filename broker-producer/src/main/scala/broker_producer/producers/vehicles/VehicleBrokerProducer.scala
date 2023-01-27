@@ -13,9 +13,10 @@ import org.apache.kafka.clients.producer.RecordMetadata
 
 import scala.concurrent.Future
 
-class VehicleBrokerProducer extends BrokerProducerImpl[Long, List[VehicleEntity]] {
-
-  val topic: String = brokerProducerConfig.getString("broker_producer.topic")
+class VehicleBrokerProducer
+    extends BrokerProducerImpl[Long, List[VehicleEntity]](
+      brokerProducerConfig.getString("broker_producer.topic")
+    ) {
 
   def produce(
       vehicles: List[VehicleEntity]
