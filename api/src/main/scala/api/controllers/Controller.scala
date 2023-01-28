@@ -7,14 +7,13 @@ import io.circe.syntax._
 import akka.http.scaladsl.server.{ Directives, Route }
 import io.circe.Encoder
 import api.Main.{ apiConfig, apiExecutionContext, apiLogger, apiSystem }
-import database.throwables.DatabaseException
 
 import scala.concurrent.Future
 
 trait Controller extends Directives {
   def routes: Route
 
-  def toJson[R: Encoder](k: Future[Either[DatabaseException, R]]): Future[String] =
+  def toJson[R: Encoder](k: Future[Either[Exception, R]]): Future[String] =
     k.map {
       case Right(response) => response.asJson.spaces4SortKeys
       case Left(error) =>

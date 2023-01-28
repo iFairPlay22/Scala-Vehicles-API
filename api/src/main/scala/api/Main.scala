@@ -26,6 +26,8 @@ object Main {
   private val SERVER_PORT: Int =
     apiConfig.getInt("api.server-port")
 
+  apiLogger.info(f"Creating an HTTP server in $SERVER_HOST:$SERVER_PORT")
+
   final implicit val apiHttp: HttpExt = Http()
 
   final implicit val apiServer: Future[Http.ServerBinding] = apiHttp
@@ -38,15 +40,20 @@ object Main {
   def init(): Future[Done] = Future(Done)
 
   def terminate(): Future[Done] =
-    apiServer
-      .flatMap(_.unbind())
-      .andThen(_ => database.Main.terminate())
+    Future(Done)
+      .andThen(_ => apiLogger.info("Calling api.Main.terminate()"))
+      .flatMap(_ =>
+        apiServer
+          .flatMap(_.unbind())
+      )
 
   def main(args: Array[String]): Unit = {
+    /*
     StdIn.readLine()
     Await.ready(
       terminate(),
       Duration.Inf
     )
+     */
   }
 }

@@ -20,22 +20,21 @@ object Main {
   final val brokerProducerLogger         = Logging(brokerProducerSystem, "broker-producer-logger")
   final val brokerProducerConfig: Config = brokerProducerSystem.settings.config
 
-  // Producer
-  final val brokerProducerProducer: VehicleBrokerProducer = new VehicleBrokerProducer()
-
   // Scheduler
   final val brokerProducerScheduler: AppScheduler = new AppScheduler()
 
   def terminate(): Future[Done] =
     Future(Done)
+      .andThen(_ => brokerProducerLogger.info("Calling broker_producer.Main.terminate()"))
       .andThen(_ => brokerProducerScheduler.terminate())
-      .andThen(_ => brokerProducerProducer.terminate())
 
   def main(args: Array[String]): Unit = {
+    /*
     StdIn.readLine()
     Await.ready(
       terminate(),
       Duration.Inf
     )
+     */
   }
 }

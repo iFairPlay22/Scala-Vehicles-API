@@ -162,9 +162,8 @@ class DatabaseSpecs extends AsyncWordSpec with Matchers with BeforeAndAfterAll w
 
   }
 
-  override def afterAll(): Unit = {
+  override def afterAll(): Unit =
     super.afterAll()
-    database.Main.terminate()
-  }
+    // database.Main.terminate()
 
 }

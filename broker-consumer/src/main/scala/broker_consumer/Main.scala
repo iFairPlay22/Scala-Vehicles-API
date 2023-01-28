@@ -18,20 +18,24 @@ object Main {
   final val brokerConsumerLogger         = Logging(brokerConsumerSystem, "broker-consumer-logger")
   final val brokerConsumerConfig: Config = brokerConsumerSystem.settings.config
 
-  // Consumer
-  final val consumer: VehicleBrokerConsumer = new VehicleBrokerConsumer()
-
   // Database
   database.Main.init()
 
+  // Consumer
+  final val consumer: VehicleBrokerConsumer = new VehicleBrokerConsumer()
+
   def terminate(): Future[Done] =
-    consumer.terminate().andThen(_ => database.Main.terminate())
+    Future(Done)
+      .andThen(_ => brokerConsumerLogger.info("Calling broker_consumer.Main.terminate()"))
+      .flatMap(_ => consumer.terminate())
 
   def main(args: Array[String]): Unit = {
+    /*
     StdIn.readLine()
     Await.ready(
       terminate(),
       Duration.Inf
     )
+     */
   }
 }

@@ -6,9 +6,9 @@ import broker_producer.Main.{
   brokerProducerConfig,
   brokerProducerExecutionContext,
   brokerProducerLogger,
-  brokerProducerProducer,
   brokerProducerSystem
 }
+import broker_producer.producers.vehicles.VehicleBrokerProducer
 import infra.providers.VehicleProvider
 
 import scala.concurrent.Future
@@ -21,8 +21,13 @@ class AppScheduler() {
   final val DATA_INGESTION_REFRESH_DELAY =
     brokerProducerConfig.getInt("broker_producer.scheduler.refresh-delay-seconds").seconds;
 
+  // Producer
+  final val brokerProducerProducer: VehicleBrokerProducer = new VehicleBrokerProducer()
+
   final val scheduler: Cancellable = {
-    brokerProducerLogger.info("[AppScheduler]: Initializing tasks in producer")
+    brokerProducerLogger.info(
+      f"[AppScheduler]: Initializing tasks in producer with initialDelay=$DATA_INGESTION_INITIAL_DELAY s and refreshDelay=$DATA_INGESTION_REFRESH_DELAY s"
+    )
 
     brokerProducerSystem.scheduler
       // Every 30 seconds, we call the external API to get the vehicles, and we produce dedicated kafka events
@@ -67,6 +72,9 @@ class AppScheduler() {
       }
     }
 
-  def terminate(): Unit =
+  def terminate(): Unit = {
     scheduler.cancel()
+    brokerProducerProducer.terminate()
+  }
+
 }

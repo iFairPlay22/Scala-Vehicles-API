@@ -18,15 +18,13 @@ import api.controllers.responses.{
 }
 import api.services.map.MapService
 import database.repositories.VehicleRepository
-import database.throwables.DatabaseException
 import domain.data.positions.{ LatLongEntity, TilesEntity }
 
 import scala.concurrent.Future
 
 object VehicleService extends Service {
 
-  def getAvailableVehiclesResponse()
-      : Future[Either[DatabaseException, GetAvailableVehiclesResponse]] =
+  def getAvailableVehiclesResponse(): Future[Either[Exception, GetAvailableVehiclesResponse]] =
     for {
       eitherErrorOrVehicles <- VehicleRepository.selectAll()
     } yield {
@@ -38,7 +36,7 @@ object VehicleService extends Service {
 
   def getLastPositionOfVehicleResponse(
       vehicle_id: Int
-  ): Future[Either[DatabaseException, GetLastPositionOfVehicleResponse]] =
+  ): Future[Either[Exception, GetLastPositionOfVehicleResponse]] =
     for {
       eitherErrorOrMaybeVehicle <- VehicleRepository.selectOne(vehicle_id)
     } yield {
@@ -47,15 +45,17 @@ object VehicleService extends Service {
           maybeVehicle match {
             case Some(vehicle) => Right(LatLongResponseMapper.entityToResponse(vehicle.latLong))
             case None =>
-              throw new NoSuchElementException(
-                "Unable to get vehicle last position : No vehicle found!"
+              Left(
+                new NoSuchElementException(
+                  "Unable to get vehicle last position : No vehicle found!"
+                )
               )
           }
         case Left(error) => Left(error)
       }
     }
 
-  def getFilledTiles(): Future[Either[DatabaseException, Seq[TilesEntity]]] =
+  def getFilledTiles(): Future[Either[Exception, Seq[TilesEntity]]] =
     for {
       eitherErrorOrVehicles <- VehicleRepository.selectAll()
     } yield {
@@ -66,7 +66,7 @@ object VehicleService extends Service {
       }
     }
 
-  def getFilledTilesResponse(): Future[Either[DatabaseException, GetFilledTilesResponse]] =
+  def getFilledTilesResponse(): Future[Either[Exception, GetFilledTilesResponse]] =
     for {
       eitherErrorOrFilledTiles <- getFilledTiles()
     } yield {
@@ -79,7 +79,7 @@ object VehicleService extends Service {
   def getAvailableVehiclesInTileResponse(
       tileX: Int,
       tileY: Int
-  ): Future[Either[DatabaseException, GetAvailableVehiclesInTileResponse]] = {
+  ): Future[Either[Exception, GetAvailableVehiclesInTileResponse]] = {
 
     val tileQuadKey = MapService.getPixelsFromTiles(TilesEntity(tileX, tileY))
     for {
@@ -100,7 +100,7 @@ object VehicleService extends Service {
   }
 
   def countAvailableVehiclesResponse()
-      : Future[Either[DatabaseException, CountAvailableVehiclesPerTileResponse]] =
+      : Future[Either[Exception, CountAvailableVehiclesPerTileResponse]] =
     for {
       eitherErrorOrFilledTiles <- getFilledTiles()
     } yield {

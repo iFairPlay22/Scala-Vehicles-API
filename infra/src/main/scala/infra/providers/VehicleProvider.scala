@@ -25,14 +25,13 @@ object VehicleProvider extends Providers {
   final implicit val jsonStreamingSupport: JsonEntityStreamingSupport =
     EntityStreamingSupport.json()
 
-  final val VEHICLES_API_HOST: String  = infraConfig.getString("infra.vehicles-api.host")
-  final val VEHICLES_API_PORT: String  = infraConfig.getString("infra.vehicles-api.port")
-  final val VEHICLES_API_ROUTE: String = infraConfig.getString("infra.vehicles-api.route")
-  final val VEHICLE_API_URL: String    = f"$VEHICLES_API_HOST:$VEHICLES_API_PORT$VEHICLES_API_ROUTE"
+  final val VEHICLES_API_ENDPOINT: String = infraConfig.getString("infra.vehicles-api.endpoint")
+  final val VEHICLES_API_ROUTE: String    = infraConfig.getString("infra.vehicles-api.route")
+  final val VEHICLE_API_URL: String       = f"http://$VEHICLES_API_ENDPOINT$VEHICLES_API_ROUTE"
 
   def getVehicles(): Future[Either[InfraException, List[VehicleEntity]]] = {
 
-    infraLogger.info(f"[VehicleProvider] Calling API $VEHICLE_API_URL")
+    infraLogger.info(f"[VehicleProvider] Calling endpoint $VEHICLE_API_URL")
 
     for {
       eitherExceptionOrReq: Either[InfraException, HttpResponse] <- {

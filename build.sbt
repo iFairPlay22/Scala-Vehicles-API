@@ -95,14 +95,7 @@ lazy val projectLibraryDependencies =
     }
 
     val java = new {
-      val javaVersion           = "11.0.15"
-      val javaDriverCoreVersion = "4.15.0"
-
-      val javaDriverCore = "com.datastax.oss" % "java-driver-core" % "4.15.0"
-
-      val all = Seq(
-        javaDriverCore
-      )
+      val javaVersion = "11.0.15"
     }
 
     val logback = new {
@@ -163,12 +156,17 @@ lazy val projectLibraryDependencies =
     }
 
     val akkaCassandra = new {
-      val akkaCassandraVersion = "1.1.0"
+      val akkaStreamAlpakkaCassandraVersion  = "5.0.0"
+      val esriGeometryApiVersion             = "2.2.4"
+      val tinkerpopTinkerGraphGremlinVersion = "3.6.2"
 
-      val akkaPersistenceCassandra =
-        "com.typesafe.akka" %% "akka-persistence-cassandra" % akkaCassandraVersion
+      val akkaStreamAlpakkaCassandra =
+        "com.lightbend.akka" %% "akka-stream-alpakka-cassandra" % akkaStreamAlpakkaCassandraVersion
+      val esriGeometryApi = "com.esri.geometry" % "esri-geometry-api" % esriGeometryApiVersion
+      val tinkerpopTinkerGraphGremlin =
+        "org.apache.tinkerpop" % "tinkergraph-gremlin" % tinkerpopTinkerGraphGremlinVersion
 
-      val all = Seq(akkaPersistenceCassandra)
+      val all = Seq(akkaStreamAlpakkaCassandra, esriGeometryApi, tinkerpopTinkerGraphGremlin)
     }
 
     val kafka = new {
@@ -184,7 +182,6 @@ lazy val projectLibraryDependencies =
 
 lazy val commonLibraryDependencies =
   projectLibraryDependencies.scala.all ++
-    projectLibraryDependencies.java.all ++
     projectLibraryDependencies.logback.all ++
     projectLibraryDependencies.akkaHttp.all ++
     projectLibraryDependencies.akkaStream.all
