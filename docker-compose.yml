@@ -2,30 +2,33 @@ version: '3.8'
 
 services:
 
-  client:
-    image: ghcr.io/lunatech-labs/lunatech-data-ingestion-platform-metroapi:1.0
-    ports:
-      - "3000:3000"
-
   cassandra:
     image: cassandra:latest
     ports:
       - "9042:9042"
     environment:
-      - CASSANDRA_CLUSTER_NAME=akka-cassandra-cluster
+      - CASSANDRA_CLUSTER_NAME=datacenter1
 
   cassandra-init:
     image: cassandra:latest
     depends_on:
       - cassandra
     volumes:
-      - ./cassandra-init.cql:/cassandra-init.cql
+      - ./database/src/main/resources/cassandra-init.cql:/cassandra-init.cql
     entrypoint:
       - bash
       - -c
       - |
         while ! bash -c "echo > /dev/tcp/cassandra/9042" 2> /dev/null; do sleep 1; done
-        cqlsh cassandra < cassandra-init.cql
+        
+        echo "CREATE KEYSPACE production WITH replication = {'class':'SimpleStrategy', 'replication_factor' : 1};" >> data-init.cql
+        echo "" >> data-init.cql
+        echo "USE production;" >> data-init.cql
+        echo "" >> data-init.cql
+        cat cassandra-init.cql >> data-init.cql
+        cat data-init.cql
+        
+        cqlsh cassandra < data-init.cql
 
   zookeeper:
     image: confluentinc/cp-zookeeper:latest
@@ -76,6 +79,7 @@ services:
       - VEHICLES_API_HOST=0.0.0.0
       - VEHICLES_API_PORT=8080
       - DATABASE_CONTACT_POINT=cassandra:9042
+      - DATABASE_KEYSPACE=production
     entrypoint:
       - bash
       - -c
@@ -86,15 +90,16 @@ services:
       - cassandra
       - cassandra-init
 
-  vehicles-broker-producer:
+  broker-producer:
     image: vehicles-broker-producer:${VERSION}
     networks:
       - default
     environment:
       - BROKER_BOOTSTRAP_SERVERS=broker:9092
       - BROKER_VEHICLES_TOPIC=vehicles
-      - INFRA_VEHICLES_EXTERNAL_API_ENDPOINT=client:3000
-      - INFRA_VEHICLES_EXTERNAL_API_ROUTE=/api
+      - BROKER_SCHEDULER_INITIAL_DELAY=5 seconds
+      - BROKER_SCHEDULER_REFRESH_DELAY=1 minute
+
     entrypoint:
       - bash
       - -c
@@ -105,7 +110,7 @@ services:
       - broker
       - broker-init
 
-  vehicles-broker-consumer:
+  broker-consumer:
     image: vehicles-broker-consumer:${VERSION}
     networks:
       - default
@@ -113,6 +118,7 @@ services:
       - BROKER_BOOTSTRAP_SERVERS=broker:9092
       - BROKER_VEHICLES_TOPIC=vehicles
       - DATABASE_CONTACT_POINT=cassandra:9042
+      - DATABASE_KEYSPACE=production
     entrypoint:
       - bash
       - -c

@@ -1,148 +1,44 @@
 package database.repositories
 
-import akka.stream.scaladsl.{ Sink, Source }
-import akka.{ Done, NotUsed }
+import akka.Done
+import akka.actor.ActorSystem
+import akka.stream.alpakka.cassandra.scaladsl.CassandraSession
 import com.datastax.oss.driver.api.core.cql.Row
-import database.constants.DatabaseConstants._
-import database.throwables.{
-  UnableToInsertOrEditVehicleInDatabaseException,
-  UnableToSelectAllVehicleInDatabaseException,
-  UnableToSelectOneVehicleInDatabaseException,
-  UnableToTruncateTableInDatabaseException
-}
-import database.Main.{
-  databaseCassandraSession,
-  databaseConfig,
-  databaseExecutionContext,
-  databaseLogger,
-  databaseSystem
-}
-import domain.data.positions.LatLongEntity
-import domain.data.vehicles.VehicleEntity
+import commons.system.database._CassandraRepositorySystem
+import database.keyspace.Keyspace._
+import domain.data.vehicles.VehicleDomain
 
-import scala.collection.immutable
+import java.time.{Instant, LocalDate}
+import java.util.Date
 import scala.concurrent.Future
 
-object VehicleRepository extends Repository {
+class VehicleRepository(implicit val system: ActorSystem, implicit val session: CassandraSession)
+    extends _CassandraRepositorySystem {
 
-  private def batchQuery(requests: List[String]): String = {
+  import VehicleRepository._
 
-    val str_requests = requests.mkString("\n")
+  def insertOrEdit(vehicle: VehicleDomain): Future[Done] =
+    queryToEmptyResult(insertOrEditQuery, List(LocalDate.now(), vehicle.id, vehicle.name))
 
-    f"""
-       > BEGIN BATCH
-       >
-       > $str_requests
-       >
-       > APPLY BATCH;
-       > """.stripMargin('>')
+  def selectAllByDate(date: LocalDate): Future[Seq[VehicleDomain]] = {
+    queryToMultipleResult(selectAllByDateQuery, List(date), mapRowToEntity)
   }
 
-  private def truncateTableQuery(): String =
+  private def mapRowToEntity(row: Row): VehicleDomain =
+    VehicleDomain(row.getInt(table_vehicle_field_id), row.getString(table_vehicle_field_name))
+}
+
+object VehicleRepository {
+
+  private val insertOrEditQuery: String =
     f"""
-    > TRUNCATE $keyspace_universe_name.$table_vehicle_name;
-    > """.stripMargin('>')
+       > INSERT INTO $table_vehicle_name
+       > ($table_vehicle_field_date_bucket, $table_vehicle_field_id, $table_vehicle_field_name)
+       > VALUES (?, ?, ?);
+       > """.stripMargin('>')
 
-  private def updateVehicleByIdQuery(): String =
+  private val selectAllByDateQuery: String =
     f"""
-    > UPDATE $keyspace_universe_name.$table_vehicle_name
-    >     SET 
-    >       $table_vehicle_field_name_route_id              = ?,
-    >       $table_vehicle_field_name_run_id                = ?,
-    >       $table_vehicle_field_name_heading               = ?,
-    >       $table_vehicle_field_name_predictable           = ?,
-    >       $table_vehicle_field_name_latitude              = ?,
-    >       $table_vehicle_field_name_longitude             = ?,
-    >       $table_vehicle_field_name_seconds_since_report  = ?
-    >   WHERE
-    >       $table_vehicle_field_id_id                      = ?;
-    > """.stripMargin('>')
-
-  private def selectAllQuery(): String =
-    f"""
-    > SELECT * FROM $keyspace_universe_name.$table_vehicle_name;
-    > """.stripMargin('>')
-
-  private def selectOneQuery(): String =
-    f"""
-    > SELECT * FROM $keyspace_universe_name.$table_vehicle_name WHERE id = ?;
-    > """.stripMargin('>')
-
-  def truncateTable(): Future[Either[UnableToTruncateTableInDatabaseException, Done]] =
-    queryToEmptyResult(
-      truncateTableQuery(),
-      List.empty
-    ).map(res => Right(res))
-      .recover { _ =>
-        Left(new UnableToTruncateTableInDatabaseException())
-      }
-
-  def insertOrEdit(
-      vehicle: VehicleEntity
-  ): Future[Either[UnableToInsertOrEditVehicleInDatabaseException, Done]] =
-    queryToEmptyResult(
-      updateVehicleByIdQuery(),
-      List(
-        vehicle.routeId,
-        vehicle.runId,
-        vehicle.heading,
-        vehicle.predictable,
-        vehicle.latLong.latitude,
-        vehicle.latLong.longitude,
-        vehicle.secondsSinceReport,
-        vehicle.id
-      )
-    ).map(res => Right(res))
-      .recover { _ =>
-        Left(new UnableToInsertOrEditVehicleInDatabaseException())
-      }
-
-  def insertOrEdit(
-      vehicles: immutable.Iterable[VehicleEntity]
-  ): Future[Either[UnableToInsertOrEditVehicleInDatabaseException, Done]] =
-    Source(vehicles)
-      .mapAsync(3)(vehicle => insertOrEdit(vehicle))
-      .runWith(Sink.ignore)
-      .map(res => Right(res))
-      .recover { _ =>
-        Left(new UnableToInsertOrEditVehicleInDatabaseException())
-      }
-
-  def selectAll(): Future[Either[UnableToSelectAllVehicleInDatabaseException, Seq[VehicleEntity]]] =
-    queryToMultipleResult(
-      selectAllQuery(),
-      List(),
-      mapRowToEntity
-    ).map(res => Right(res))
-      .recover { _ =>
-        Left(new UnableToSelectAllVehicleInDatabaseException())
-      }
-
-  def selectOne(
-      id: Int
-  ): Future[Either[UnableToSelectOneVehicleInDatabaseException, Option[VehicleEntity]]] =
-    queryToOptionalSingleResult(
-      selectOneQuery(),
-      List(id),
-      mapRowToEntity
-    ).map(res => Right(res))
-      .recover { _ =>
-        Left(new UnableToSelectOneVehicleInDatabaseException())
-      }
-
-  // Transform a com.datastax.oss.driver.api.core.cql.Row to a PersonEntity
-  private def mapRowToEntity(row: Row): VehicleEntity =
-    VehicleEntity(
-      row.getInt(table_vehicle_field_id_id),
-      row.getInt(table_vehicle_field_name_route_id),
-      row.getInt(table_vehicle_field_name_run_id),
-      row.getInt(table_vehicle_field_name_heading),
-      row.getBoolean(table_vehicle_field_name_predictable),
-      LatLongEntity(
-        row.getDouble(table_vehicle_field_name_latitude),
-        row.getDouble(table_vehicle_field_name_longitude)
-      ),
-      row.getInt(table_vehicle_field_name_seconds_since_report)
-    )
-
+       > SELECT * FROM $table_vehicle_name WHERE $table_vehicle_field_date_bucket = ?;
+       > """.stripMargin('>')
 }
