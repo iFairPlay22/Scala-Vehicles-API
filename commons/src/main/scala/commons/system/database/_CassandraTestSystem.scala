@@ -49,9 +49,10 @@ object _CassandraSystemForTests {
       .flatMap(_ => session.executeDDL(useKeyspaceQuery(keyspace)))
       .flatMap(_ => session.executeDDL(schema))
 
-  private def dropKeyspace(keyspace: String)(implicit session: CassandraSession): Future[Done] =
-    session
-      .executeDDL(dropKeyspaceIfExistsQuery(keyspace))
+  private def dropKeyspace(keyspace: String)(implicit
+      session: CassandraSession,
+      executor: ExecutionContext): Future[Done] =
+    session.executeDDL(dropKeyspaceIfExistsQuery(keyspace))
 
   private def createKeyspaceIfNotExistsQuery(keyspace: String): String =
     f"""
@@ -80,7 +81,7 @@ trait _CassandraTestSystem
     with BeforeAndAfterEach
     with _CassandraSystemForTests {
 
-  final implicit val awaitDuration: Duration = 30 seconds
+  final implicit val awaitDuration: Duration = 2 minutes
   override implicit lazy val executor: ExecutionContextExecutor = system.dispatcher
 
   def decodeResponse[T: Decoder](resp: String): T = {
@@ -100,6 +101,7 @@ trait _CassandraTestSystem
 
   override def beforeAll(): Unit = {
     super.beforeAll()
+    await(resetCassandraEnvironment())
   }
 
   override def beforeEach(): Unit = {

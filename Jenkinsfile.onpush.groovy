@@ -26,10 +26,30 @@ pipeline {
                 sh 'sbt scalafmtCheckAll'
             }
         }
-        stage('Test') {
+        stage('General tests') {
             steps {
-                echo 'Testing...'
-                sh 'sbt test'
+                echo 'General testing...'
+                sh 'sbt commons/test'
+                sh 'sbt database/test'
+            }
+        }
+        stage('API tests') {
+            steps {
+                echo 'API testing...'
+                sh 'sbt api/test'
+            }
+        }
+        stage('Broker tests') {
+            steps {
+                echo 'Broker testing...'
+                sh 'sbt brokerProducer/test'
+                sh 'sbt brokerConsumer/test'
+            }
+        }
+        stage('Newman tests') {
+            steps {
+                echo 'Newman testing...'
+                // TODO
             }
         }
     }

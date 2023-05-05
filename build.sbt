@@ -4,6 +4,7 @@ lazy val global = (project in file("."))
     name := "vehicles-project-root",
     scalaVersion := projectLibraryDependencies.scala.scalaVersion,
     libraryDependencies ++= globalLibraryDependencies,
+    Test / parallelExecution := false,
     publish / skip := true)
   .aggregate(commons, domain, brokerConsumer, brokerProducer, database, api)
   .dependsOn(commons, domain, brokerConsumer, brokerProducer, database, api)
