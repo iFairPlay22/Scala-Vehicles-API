@@ -29,7 +29,7 @@ pipeline {
         stage('General tests') {
             steps {
                 echo 'General testing...'
-                sh 'sbt commons/test'
+                sh 'sbt domain/test'
                 sh 'sbt database/test'
             }
         }
