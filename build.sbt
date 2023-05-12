@@ -2,7 +2,7 @@
 lazy val global = (project in file("."))
   .settings(defaultSettings)
   .settings(
-    name := "vehicles-project-root",
+    name := "vehicles-root",
     scalaVersion := projectLibraryDependencies.scala.scalaVersion,
     libraryDependencies ++= commonsLibraryDependencies,
     Test / parallelExecution := false,
@@ -64,10 +64,11 @@ lazy val domain = (project in file("domain"))
   .dependsOn()
 
 // Default settings
-lazy val defaultSettings = Seq(organization := "ebouquet")
+lazy val defaultSettings = Seq(organization := "ewenbouquet")
 
 // Docker plugin settings
-lazy val dockerSettings = Seq(dockerBaseImage := "openjdk:11", dockerUsername := Some("ebouquet"))
+lazy val dockerSettings =
+  Seq(dockerBaseImage := "openjdk:11", dockerUsername := Some("ewenbouquet"))
 
 // Library dependencies
 lazy val projectLibraryDependencies =
@@ -77,10 +78,10 @@ lazy val projectLibraryDependencies =
       val scalaVersion = "2.13.10"
     }
 
-    val ebouquet = new {
+    val ewenbouquet = new {
       val commonsVersion = "0.1.0-SNAPSHOT"
 
-      val commons = "ebouquet" %% "commons-project-commons" % commonsVersion
+      val commons = "ewenbouquet" %% "commons-libs" % commonsVersion
 
       val all = Seq(commons)
     }
@@ -88,4 +89,4 @@ lazy val projectLibraryDependencies =
   }
 
 lazy val commonsLibraryDependencies =
-  projectLibraryDependencies.ebouquet.all
+  projectLibraryDependencies.ewenbouquet.all
