@@ -1,8 +1,12 @@
-# Vehicles API
+# Vehicles
 
 Simple project with Scala, Akka, Cassandra, Kafka and Circe.
 
 ## Setup the environment
+
+### Requirements
+
+    export NEXUS_BASE_URL=https://$NEXUS_HOST_URL
 
 ### Code Style
 
@@ -18,7 +22,6 @@ Generate the artifacts locally:
 
 Generate the artifacts images publicly:
 
-    export JENKINS_BASE_URL=https://$JENKINS_HOST_URL
     sbt publish
 
 ### Docker images
@@ -33,14 +36,26 @@ Generate the docker images publicly:
 
 ### Launch the app
 
-Set the deployment version (ex: 0.1.0-SNAPSHOT):
-
-    export VERSION=0.1.0-SNAPSHOT
-
 Generate the docker images locally:
 
     sbt docker:publishLocal
 
+Set the deployment version (ex: 0.1.0-SNAPSHOT):
+
+    export VERSION=0.1.0-SNAPSHOT
+
 Launch the services:
 
     docker-compose up
+
+## Interacting with the sample
+
+### Postman
+
+You can test the endpoints by using the postman collection `api.postman_collection.json`. You can directly import it into Postman.
+
+### Endpoints
+
+Get all available vehicles:
+
+    curl --location --request GET 'http://127.0.0.1:8080/api/vehicles'
