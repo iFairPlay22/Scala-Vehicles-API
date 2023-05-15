@@ -1,6 +1,6 @@
 package domain_test
 
-import domain.data.vehicles.VehicleDomain
+import domain.vehicles.VehicleDomain
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 

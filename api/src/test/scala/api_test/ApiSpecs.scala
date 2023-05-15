@@ -7,9 +7,9 @@ import api.vehicles.controller.VehicleController
 import api.vehicles.dto.GetVehiclesDTO
 import api.vehicles.mapper.VehicleResponseMapper
 import commons.system.database._CassandraTestSystem
+import database.vehicles.repositories.VehicleRepository
 import org.scalatest.matchers.should.Matchers
-import database.repositories.VehicleRepository
-import domain.data.vehicles.VehicleDomain
+import domain.vehicles.VehicleDomain
 import io.circe.generic.codec.DerivedAsObjectCodec.deriveCodec
 import org.scalatest.concurrent.ScalaFutures
 

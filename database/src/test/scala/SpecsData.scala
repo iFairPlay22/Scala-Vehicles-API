@@ -1,4 +1,4 @@
-import domain.data.vehicles.VehicleDomain
+import domain.vehicles.VehicleDomain
 
 trait SpecsData {
 

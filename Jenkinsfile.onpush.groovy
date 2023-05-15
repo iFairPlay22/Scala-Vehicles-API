@@ -7,7 +7,7 @@ pipeline {
     environment {
         VEHICLES_API_HOST               = '0.0.0.0'
         VEHICLES_API_PORT               = '8080'
-        BROKER_VEHICLES_TOPIC           = 'vehicles'
+        BROKER_VEHICLES_TOPIC           = 'ewenbouquet_vehicles'
         BROKER_BOOTSTRAP_SERVERS        = 'broker:9092'
         BROKER_SCHEDULER_INITIAL_DELAY  = '5 seconds'
         BROKER_SCHEDULER_REFRESH_DELAY  = '1 minute'

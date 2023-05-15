@@ -1,7 +1,7 @@
 package api.vehicles.mapper
 
 import api.vehicles.dto.{GetVehiclesDTO, VehicleDTO}
-import domain.data.vehicles.VehicleDomain
+import domain.vehicles.VehicleDomain
 
 object VehicleResponseMapper {
 

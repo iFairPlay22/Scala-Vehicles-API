@@ -1,6 +1,5 @@
 package broker_consumer.vehicles.consumers
 
-import domain.data.vehicles.VehicleDomain
 import akka.Done
 import akka.actor.ActorSystem
 import akka.http.scaladsl.model.DateTime
@@ -11,7 +10,8 @@ import io.circe.syntax._
 import com.typesafe.scalalogging.Logger
 import commons.system.broker._BrokerConsumerSystem
 import commons.system.database._CassandraSystem
-import database.repositories.VehicleRepository
+import database.vehicles.repositories.VehicleRepository
+import domain.vehicles.VehicleDomain
 
 import scala.concurrent.Future
 import scala.util.{Failure, Success, Try}

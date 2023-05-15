@@ -6,7 +6,7 @@ import akka.stream.alpakka.cassandra.scaladsl.CassandraSession
 import api.vehicles.dto.GetVehiclesDTO
 import api.vehicles.mapper.VehicleResponseMapper
 import commons.system.http._HttpServiceSystem
-import database.repositories.VehicleRepository
+import database.vehicles.repositories.VehicleRepository
 
 import java.time.LocalDate
 import scala.concurrent.Future

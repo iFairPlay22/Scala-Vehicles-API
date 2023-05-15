@@ -1,6 +1,6 @@
 import akka.actor.ActorSystem
 import commons.system.database._CassandraTestSystem
-import database.repositories.VehicleRepository
+import database.vehicles.repositories.VehicleRepository
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.concurrent.ScalaFutures
 

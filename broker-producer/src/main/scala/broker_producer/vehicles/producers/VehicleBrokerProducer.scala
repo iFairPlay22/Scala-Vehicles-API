@@ -4,7 +4,7 @@ import io.circe.generic.auto._
 import akka.actor.ActorSystem
 import akka.http.scaladsl.model.DateTime
 import commons.system.broker._BrokerProducerSystem
-import domain.data.vehicles.VehicleDomain
+import domain.vehicles.VehicleDomain
 import org.apache.kafka.clients.producer.RecordMetadata
 
 import scala.concurrent.Future

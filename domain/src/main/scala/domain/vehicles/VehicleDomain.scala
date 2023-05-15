@@ -1,4 +1,4 @@
-package domain.data.vehicles
+package domain.vehicles
 
 import commons.data._Domain
 import commons.utils._RandomGen

@@ -6,7 +6,7 @@ import broker_producer.vehicles.producers.VehicleBrokerProducer
 import com.typesafe.scalalogging.Logger
 import commons.system.actor._ActorSystem
 import commons.system.scheduler._SchedulerSystem
-import domain.data.vehicles.VehicleDomain
+import domain.vehicles.VehicleDomain
 
 import java.time.Duration
 import scala.concurrent.Future

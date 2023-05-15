@@ -1,4 +1,4 @@
-package database.keyspace
+package database.vehicles.keyspace
 
 object Keyspace {
 
