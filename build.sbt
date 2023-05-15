@@ -46,7 +46,7 @@ lazy val brokerProducer = (project in file("broker-producer"))
     Docker / packageName := "vehicles-broker-producer")
   .dependsOn(domain)
 
-lazy val database = (project in file("database/vehicles"))
+lazy val database = (project in file("database"))
   .settings(defaultSettings)
   .settings(
     name := "vehicles-database",
