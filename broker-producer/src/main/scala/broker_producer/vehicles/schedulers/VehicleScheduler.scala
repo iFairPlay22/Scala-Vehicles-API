@@ -16,11 +16,6 @@ class VehicleScheduler(implicit val system: ActorSystem) extends _SchedulerSyste
 
   private val logger: Logger = Logger(getClass)
 
-  override val initialDelay: Duration =
-    config.getDuration("broker_producer.scheduler.initial-delay");
-  override val refreshDelay: Duration =
-    config.getDuration("broker_producer.scheduler.refresh-delay");
-
   private final val brokerProducer: VehicleBrokerProducer = new VehicleBrokerProducer()
   override def startScheduler(): Future[Done] =
     brokerProducer

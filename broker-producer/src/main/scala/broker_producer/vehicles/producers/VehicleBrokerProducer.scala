@@ -13,8 +13,6 @@ import scala.util.Try
 class VehicleBrokerProducer(implicit val system: ActorSystem)
     extends _BrokerProducerSystem[DateTime, VehicleDomain] {
 
-  override val topic: String = config.getString("broker_producer.topic")
-
   def produce(vehicle: VehicleDomain): Future[RecordMetadata] =
     super.produce(DateTime.now, vehicle)
 

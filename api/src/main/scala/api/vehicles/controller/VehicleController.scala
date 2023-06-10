@@ -7,13 +7,15 @@ import api.vehicles.service.VehicleService
 import commons.system.http._HttpControllerSystem
 import io.circe.generic.auto._
 
-class VehicleController(implicit val system: ActorSystem, implicit val cassandraSession: CassandraSession)
+class VehicleController(
+    implicit val system: ActorSystem,
+    implicit val cassandraSession: CassandraSession)
     extends _HttpControllerSystem {
 
   private val vehicleService = new VehicleService()
 
   override val routes: Route =
-    path("vehicles") {
+    path("api" / "vehicles") {
       get {
         response { () =>
           vehicleService

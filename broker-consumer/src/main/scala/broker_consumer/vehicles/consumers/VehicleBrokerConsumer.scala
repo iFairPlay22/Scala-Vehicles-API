@@ -24,8 +24,6 @@ class VehicleBrokerConsumer(implicit val system: ActorSystem)
 
   private val vehicleRepository = new VehicleRepository()
 
-  override val topic: String = config.getString("broker_consumer.topic")
-
   override val callbacks: Set[(DateTime, VehicleDomain) => Future[Done]] = Set((_, vehicle) => {
     logger.info("Processing a consumed vehicle")
     vehicleRepository
