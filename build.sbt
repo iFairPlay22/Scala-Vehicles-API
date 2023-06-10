@@ -64,11 +64,21 @@ lazy val domain = (project in file("domain"))
   .dependsOn()
 
 // Default settings
-lazy val defaultSettings = Seq(organization := "ewenbouquet")
+lazy val defaultSettings = Seq(
+  organization := "ewenbouquet",
+  publishTo := {
+    val nexus =
+      sys.env.getOrElse("NEXUS_BASE_URL", "https://ewenbouquet-nexus-public-url.loca.lt")
+    if (isSnapshot.value)
+      Some("snapshots" at nexus + "/repository/maven-snapshots/")
+    else
+      Some("releases" at nexus + "/repository/maven-releases/")
+  },
+  credentials += Credentials(Path.userHome / ".sbt" / ".ewenbouquet_credentials"))
 
 // Docker plugin settings
 lazy val dockerSettings =
-  Seq(dockerBaseImage := "openjdk:11", dockerUsername := Some("ewenbouquet"))
+  Seq(dockerUsername := Some("ewenbouquet"), dockerBaseImage := "openjdk:11")
 
 // Library dependencies
 lazy val projectLibraryDependencies =

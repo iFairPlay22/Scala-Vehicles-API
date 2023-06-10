@@ -70,7 +70,7 @@ services:
       "
 
   vehicles-api:
-    image: vehicles-api:${VERSION}
+    image: ewenbouquet/vehicles-api:${VERSION}
     ports:
       - "8080:8080"
     networks:
@@ -91,7 +91,7 @@ services:
       - cassandra-init
 
   broker-producer:
-    image: vehicles-broker-producer:${VERSION}
+    image: ewenbouquet/vehicles-broker-producer:${VERSION}
     networks:
       - default
     environment:
@@ -111,7 +111,7 @@ services:
       - broker-init
 
   broker-consumer:
-    image: vehicles-broker-consumer:${VERSION}
+    image: ewenbouquet/vehicles-broker-consumer:${VERSION}
     networks:
       - default
     environment:

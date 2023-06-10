@@ -11,7 +11,7 @@ import database.vehicles.repositories.VehicleRepository
 import java.time.LocalDate
 import scala.concurrent.Future
 
-class VehicleService(implicit val system: ActorSystem, implicit val session: CassandraSession)
+class VehicleService(implicit val system: ActorSystem, implicit val cassandraSession: CassandraSession)
     extends _HttpServiceSystem {
 
   private val vehicleRepository = new VehicleRepository()

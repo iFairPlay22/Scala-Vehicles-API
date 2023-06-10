@@ -8,7 +8,7 @@ import commons.system.http._HttpServerSystem
 
 object Main extends _ActorSystem with _CassandraSystem with _HttpServerSystem {
 
-  override def routes: Route = Route.seal(new VehicleController().routes)
+  override val routes: Route = Route.seal(new VehicleController().routes)
 
   def main(args: Array[String]): Unit = {
     startServer()
