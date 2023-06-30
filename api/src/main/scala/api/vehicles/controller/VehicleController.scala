@@ -17,7 +17,7 @@ class VehicleController(
   override val routes: Route =
     path("api" / "vehicles") {
       get {
-        response { () =>
+        complete {
           vehicleService
             .getAllVehicles()
         }
