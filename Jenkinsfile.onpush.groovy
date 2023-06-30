@@ -30,7 +30,7 @@ pipeline {
             steps {
                 echo 'General testing...'
                 sh 'sbt domain/test'
-                sh 'sbt database/test'
+                sh 'sbt cassandra/test'
             }
         }
         stage('API tests') {

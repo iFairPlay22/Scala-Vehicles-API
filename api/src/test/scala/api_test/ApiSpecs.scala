@@ -1,6 +1,7 @@
 package api_test
 
 import akka.http.scaladsl.model.StatusCodes
+import akka.http.scaladsl.server.Route
 import akka.http.scaladsl.testkit.ScalatestRouteTest
 import api.vehicles.controller.VehicleController
 import api.vehicles.dto.GetVehiclesDTO
@@ -26,10 +27,10 @@ class ApiSpecs
   override implicit lazy val executor: ExecutionContextExecutor = system.dispatcher
 
   private val vehiclesRepository: VehicleRepository = new VehicleRepository()
-  private val vehiclesRoutes = new VehicleController().routes
+  private val vehiclesRoutes = Route.seal(new VehicleController().routes)
 
   def testVehiclesList(expectedVehicles: VehicleDomain*): Unit =
-    Get(f"/vehicles") ~> vehiclesRoutes ~> check {
+    Get(f"/api/vehicles") ~> vehiclesRoutes ~> check {
 
       status.shouldEqual(StatusCodes.OK)
 
