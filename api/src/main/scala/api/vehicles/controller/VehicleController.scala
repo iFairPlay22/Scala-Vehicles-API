@@ -4,7 +4,7 @@ import akka.actor.ActorSystem
 import akka.http.scaladsl.server.Route
 import akka.stream.alpakka.cassandra.scaladsl.CassandraSession
 import api.vehicles.service.VehicleService
-import commons.system.http._HttpControllerSystem
+import http._HttpControllerSystem
 import io.circe.generic.auto._
 
 class VehicleController(

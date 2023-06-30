@@ -1,4 +1,4 @@
-package database.vehicles.keyspace
+package cassandra.vehicles.keyspace
 
 object Keyspace {
 

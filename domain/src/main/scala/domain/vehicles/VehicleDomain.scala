@@ -1,9 +1,8 @@
 package domain.vehicles
 
-import commons.data._Domain
-import commons.utils._RandomGen
+import commons.random._RandomGen
 
-case class VehicleDomain(id: Int, name: String) extends _Domain {
+case class VehicleDomain(id: Int, name: String) {
   require(0 <= id, "vehicle id must be positive or zero")
   require(name.nonEmpty, "vehicle name must be non empty")
   require(

@@ -1,16 +1,13 @@
 package broker_producer.vehicles.schedulers
 
 import akka.Done
-import akka.actor.{ActorSystem, Cancellable}
+import akka.actor.ActorSystem
 import broker_producer.vehicles.producers.VehicleBrokerProducer
 import com.typesafe.scalalogging.Logger
-import commons.system.actor._ActorSystem
-import commons.system.scheduler._SchedulerSystem
 import domain.vehicles.VehicleDomain
+import scheduler._SchedulerSystem
 
-import java.time.Duration
 import scala.concurrent.Future
-import scala.util.{Failure, Success, Try}
 
 class VehicleScheduler(implicit val system: ActorSystem) extends _SchedulerSystem {
 

@@ -1,3 +1,5 @@
+package cassandra_tests
+
 import domain.vehicles.VehicleDomain
 
 trait SpecsData {

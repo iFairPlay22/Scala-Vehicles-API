@@ -1,11 +1,11 @@
-package database.vehicles.repositories
+package cassandra.vehicles.repositories
 
 import akka.Done
 import akka.actor.ActorSystem
 import akka.stream.alpakka.cassandra.scaladsl.CassandraSession
+import cassandra._CassandraRepositorySystem
 import com.datastax.oss.driver.api.core.cql.Row
-import commons.system.database._CassandraRepositorySystem
-import database.vehicles.keyspace.Keyspace._
+import cassandra.vehicles.keyspace.Keyspace._
 import domain.vehicles.VehicleDomain
 
 import java.time.{Instant, LocalDate}

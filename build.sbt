@@ -7,8 +7,8 @@ lazy val global = (project in file("."))
     libraryDependencies ++= commonsLibraryDependencies,
     Test / parallelExecution := false,
     publish / skip := true)
-  .aggregate(domain, brokerConsumer, brokerProducer, database, api)
-  .dependsOn(domain, brokerConsumer, brokerProducer, database, api)
+  .aggregate(domain, brokerConsumer, brokerProducer, cassandra, api)
+  .dependsOn(domain, brokerConsumer, brokerProducer, cassandra, api)
 
 lazy val api = (project in file("api"))
   .enablePlugins(DockerPlugin, JavaAppPackaging)
@@ -17,10 +17,10 @@ lazy val api = (project in file("api"))
   .settings(
     name := "vehicles-api",
     scalaVersion := projectLibraryDependencies.scala.scalaVersion,
-    libraryDependencies ++= commonsLibraryDependencies,
+    libraryDependencies ++= apiLibraryDependencies,
     Compile / run / mainClass := Some("api.Main"),
     Docker / packageName := "vehicles-api")
-  .dependsOn(domain, database)
+  .dependsOn(domain, cassandra)
 
 lazy val brokerConsumer = (project in file("broker-consumer"))
   .enablePlugins(DockerPlugin, JavaAppPackaging)
@@ -29,10 +29,10 @@ lazy val brokerConsumer = (project in file("broker-consumer"))
   .settings(
     name := "vehicles-broker-consumer",
     scalaVersion := projectLibraryDependencies.scala.scalaVersion,
-    libraryDependencies ++= commonsLibraryDependencies,
+    libraryDependencies ++= brokerConsumerLibraryDependencies,
     Compile / run / mainClass := Some("broker_consumer.Main"),
     Docker / packageName := "vehicles-broker-consumer")
-  .dependsOn(domain, database)
+  .dependsOn(domain, cassandra)
 
 lazy val brokerProducer = (project in file("broker-producer"))
   .enablePlugins(DockerPlugin, JavaAppPackaging)
@@ -41,18 +41,18 @@ lazy val brokerProducer = (project in file("broker-producer"))
   .settings(
     name := "vehicles-broker-producer",
     scalaVersion := projectLibraryDependencies.scala.scalaVersion,
-    libraryDependencies ++= commonsLibraryDependencies,
+    libraryDependencies ++= brokerProducerLibraryDependencies,
     Compile / run / mainClass := Some("broker_producer.Main"),
     Docker / packageName := "vehicles-broker-producer")
   .dependsOn(domain)
 
-lazy val database = (project in file("database"))
+lazy val cassandra = (project in file("cassandra"))
   .settings(defaultSettings)
   .settings(
-    name := "vehicles-database",
+    name := "vehicles-cassandra",
     scalaVersion := projectLibraryDependencies.scala.scalaVersion,
-    libraryDependencies ++= commonsLibraryDependencies,
-    Compile / run / mainClass := Some("database.Main"))
+    libraryDependencies ++= cassandraLibraryDependencies,
+    Compile / run / mainClass := Some("cassandra.Main"))
   .dependsOn(domain)
 
 lazy val domain = (project in file("domain"))
@@ -60,7 +60,7 @@ lazy val domain = (project in file("domain"))
   .settings(
     name := "vehicles-domain",
     scalaVersion := projectLibraryDependencies.scala.scalaVersion,
-    libraryDependencies ++= commonsLibraryDependencies)
+    libraryDependencies ++= domainLibraryDependencies)
   .dependsOn()
 
 // Default settings
@@ -91,12 +91,35 @@ lazy val projectLibraryDependencies =
     val ewenbouquet = new {
       val commonsVersion = "0.1.0-SNAPSHOT"
 
-      val commons = "ewenbouquet" %% "commons-libs" % commonsVersion
-
-      val all = Seq(commons)
+      val commonsBase = "ewenbouquet" %% "commons-commons-libs" % commonsVersion
+      val commonsBroker = "ewenbouquet" %% "commons-broker-libs" % commonsVersion
+      val commonsCassandra = "ewenbouquet" %% "commons-cassandra-libs" % commonsVersion
+      val commonsHttp = "ewenbouquet" %% "commons-http-libs" % commonsVersion
+      val commonsScheduler = "ewenbouquet" %% "commons-scheduler-libs" % commonsVersion
     }
 
   }
 
 lazy val commonsLibraryDependencies =
-  projectLibraryDependencies.ewenbouquet.all
+  Seq()
+
+lazy val apiLibraryDependencies =
+  commonsLibraryDependencies ++
+    Seq(projectLibraryDependencies.ewenbouquet.commonsHttp)
+
+lazy val brokerConsumerLibraryDependencies =
+  commonsLibraryDependencies ++
+    Seq(projectLibraryDependencies.ewenbouquet.commonsBroker)
+
+lazy val brokerProducerLibraryDependencies =
+  commonsLibraryDependencies ++
+    Seq(projectLibraryDependencies.ewenbouquet.commonsBroker) ++
+    Seq(projectLibraryDependencies.ewenbouquet.commonsScheduler)
+
+lazy val cassandraLibraryDependencies =
+  commonsLibraryDependencies ++
+    Seq(projectLibraryDependencies.ewenbouquet.commonsCassandra)
+
+lazy val domainLibraryDependencies =
+  commonsLibraryDependencies ++
+    Seq(projectLibraryDependencies.ewenbouquet.commonsBase)

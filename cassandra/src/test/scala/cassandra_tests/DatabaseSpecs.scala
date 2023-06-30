@@ -1,12 +1,19 @@
-import akka.actor.ActorSystem
-import commons.system.database._CassandraTestSystem
-import database.vehicles.repositories.VehicleRepository
-import org.scalatest.matchers.should.Matchers
+package cassandra_tests
+
+import cassandra._CassandraTestSystem
+import cassandra.vehicles.repositories.VehicleRepository
+import commons.actor._ActorSystem
 import org.scalatest.concurrent.ScalaFutures
+import org.scalatest.matchers.should.Matchers
 
 import java.time.LocalDate
 
-class DatabaseSpecs extends _CassandraTestSystem with Matchers with ScalaFutures with SpecsData {
+class DatabaseSpecs
+    extends _ActorSystem
+    with _CassandraTestSystem
+    with Matchers
+    with ScalaFutures
+    with SpecsData {
 
   private val vehiclesRepository: VehicleRepository = new VehicleRepository()
   private val today: LocalDate = LocalDate.now

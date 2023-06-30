@@ -1,19 +1,18 @@
 package broker_producer.vehicles.producers
 
-import io.circe.generic.auto._
 import akka.actor.ActorSystem
-import akka.http.scaladsl.model.DateTime
-import commons.system.broker._BrokerProducerSystem
+import broker._BrokerProducerSystem
 import domain.vehicles.VehicleDomain
 import org.apache.kafka.clients.producer.RecordMetadata
+import io.circe.generic.auto._
 
+import java.time.LocalDateTime
 import scala.concurrent.Future
-import scala.util.Try
 
 class VehicleBrokerProducer(implicit val system: ActorSystem)
-    extends _BrokerProducerSystem[DateTime, VehicleDomain] {
+    extends _BrokerProducerSystem[LocalDateTime, VehicleDomain] {
 
   def produce(vehicle: VehicleDomain): Future[RecordMetadata] =
-    super.produce(DateTime.now, vehicle)
+    super.produce(LocalDateTime.now, vehicle)
 
 }
