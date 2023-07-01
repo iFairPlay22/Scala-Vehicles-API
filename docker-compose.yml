@@ -16,7 +16,7 @@ services:
     depends_on:
       - cassandra
     volumes:
-      - ./database/src/main/resources/cassandra-init.cql:/cassandra-init.cql
+      - ./cassandra/src/main/resources/cassandra-init.cql:/cassandra-init.cql
     entrypoint:
       - bash
       - -c
@@ -65,18 +65,20 @@ services:
     image: confluentinc/cp-kafka:latest
     depends_on:
       - broker
-    entrypoint: [ '/bin/sh', '-c' ]
-    command: |
-      "
-      # blocks until kafka is reachable
-      kafka-topics --bootstrap-server broker:9092 --list
-      
-      echo -e 'Creating kafka topics'
-      kafka-topics --bootstrap-server broker:9092 --create --if-not-exists --topic ewenbouquet_vehicles --replication-factor 1 --partitions 1
-      
-      echo -e 'Successfully created the following topics:'
-      kafka-topics --bootstrap-server broker:9092 --list
-      "
+    entrypoint:
+      - bash
+      - -c
+      - |
+        while ! bash -c "echo > /dev/tcp/broker/9092" 2> /dev/null; do sleep 1; done
+        
+        # blocks until kafka is reachable
+        kafka-topics --bootstrap-server broker:9092 --list
+        
+        echo -e 'Creating kafka topics'
+        kafka-topics --bootstrap-server broker:9092 --create --if-not-exists --topic ewenbouquet_vehicles --replication-factor 1 --partitions 1
+        
+        echo -e 'Successfully created the following topics:'
+        kafka-topics --bootstrap-server broker:9092 --list
 
   vehicles-api:
     image: ewenbouquet/vehicles-api:${VERSION}
