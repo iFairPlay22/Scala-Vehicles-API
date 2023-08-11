@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vehicles-broker-consumer-deployment
+  labels:
+    app: vehicles-broker-consumer
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: vehicles-broker-consumer
+  template:
+    metadata:
+      labels:
+        app: vehicles-broker-consumer
+    spec:
+      containers:
+        - name: vehicles-broker-consumer
+          image: ewenbouquet/vehicles-broker-consumer:0.1.0-SNAPSHOT
+          ports:
+            - containerPort: 8080
+          env:
+            - name: BROKER_BOOTSTRAP_SERVERS
+              valueFrom:
+                configMapKeyRef:
+                  name: vehicles-config
+                  key: broker-url
+            - name: BROKER_TOPIC
+              valueFrom:
+                configMapKeyRef:
+                  name: vehicles-config
+                  key: vehicles-broker-consumer-vehicles-topic
+            - name: DATABASE_CONTACT_POINT
+              valueFrom:
+                configMapKeyRef:
+                  name: vehicles-config
+                  key: cassandra-url
+            - name: DATABASE_KEYSPACE
+              valueFrom:
+                configMapKeyRef:
+                  name: vehicles-config
+                  key: vehicles-broker-consumer-cassandra-keyspace
+            - name: DATABASE_DATACENTER
+              valueFrom:
+                configMapKeyRef:
+                  name: vehicles-config
+                  key: cassandra-datacenter

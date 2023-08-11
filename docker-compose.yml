@@ -8,13 +8,18 @@ services:
       - "9042:9042"
     environment:
       - CASSANDRA_CLUSTER_NAME=datacenter1
-    logging:
-      driver: none
+    healthcheck:
+      test: [ "CMD-SHELL", "[ $$(nodetool statusgossip) = running ]" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 1.5m
 
   cassandra-init:
     image: cassandra:latest
     depends_on:
-      - cassandra
+      cassandra:
+        condition: service_healthy
     volumes:
       - ./cassandra/src/main/resources/cassandra-init.cql:/cassandra-init.cql
     entrypoint:
@@ -41,8 +46,6 @@ services:
     environment:
       - ZOOKEEPER_CLIENT_PORT=2181
       - ZOOKEEPER_TICK_TIME=2000
-    logging:
-      driver: none
 
   broker:
     image: confluentinc/cp-kafka:latest
@@ -58,13 +61,18 @@ services:
       - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://broker:9092,PLAINTEXT_HOST://localhost:9093
       - KAFKA_LISTENER_SECURITY_PROTOCOL_MAP=PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
       - KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1
-    logging:
-      driver: none
+    healthcheck:
+      test: nc -z localhost 9092 || exit -1
+      start_period: 15s
+      interval: 5s
+      timeout: 10s
+      retries: 10
 
   broker-init:
     image: confluentinc/cp-kafka:latest
     depends_on:
-      - broker
+      broker:
+        condition: service_healthy
     entrypoint:
       - bash
       - -c
@@ -99,8 +107,10 @@ services:
         while ! bash -c "echo > /dev/tcp/cassandra/9042" 2> /dev/null; do sleep 1; done
         /opt/docker/bin/vehicles-api
     depends_on:
-      - cassandra
-      - cassandra-init
+      broker:
+        condition: service_healthy
+      broker-init:
+        condition: service_completed_successfully
 
   broker-producer:
     image: ewenbouquet/vehicles-broker-producer:${VERSION}
@@ -119,8 +129,11 @@ services:
         while ! bash -c "echo > /dev/tcp/broker/9092" 2> /dev/null; do sleep 1; done
         /opt/docker/bin/vehicles-broker-producer
     depends_on:
-      - broker
-      - broker-init
+      broker:
+        condition: service_healthy
+      broker-init:
+        condition: service_completed_successfully
+
 
   broker-consumer:
     image: ewenbouquet/vehicles-broker-consumer:${VERSION}
@@ -139,7 +152,11 @@ services:
         while ! bash -c "echo > /dev/tcp/broker/9092" 2> /dev/null; do sleep 1; done
         /opt/docker/bin/vehicles-broker-consumer
     depends_on:
-      - cassandra
-      - cassandra-init
-      - broker
-      - broker-init
+      cassandra:
+        condition: service_healthy
+      cassandra-init:
+        condition: service_completed_successfully
+      broker:
+        condition: service_healthy
+      broker-init:
+        condition: service_completed_successfully

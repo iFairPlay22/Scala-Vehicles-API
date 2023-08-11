@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vehicles-broker-producer-deployment
+  labels:
+    app: vehicles-broker-producer
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: vehicles-broker-producer
+  template:
+    metadata:
+      labels:
+        app: vehicles-broker-producer
+    spec:
+      containers:
+        - name: vehicles-broker-producer
+          image: ewenbouquet/vehicles-broker-producer:0.1.0-SNAPSHOT
+          ports:
+            - containerPort: 8080
+          env:
+            - name: BROKER_BOOTSTRAP_SERVERS
+              valueFrom:
+                configMapKeyRef:
+                  name: vehicles-config
+                  key: broker-url
+            - name: BROKER_TOPIC
+              valueFrom:
+                configMapKeyRef:
+                  name: vehicles-config
+                  key: vehicles-broker-producer-topic
+            - name: BROKER_SCHEDULER_INITIAL_DELAY
+              valueFrom:
+                configMapKeyRef:
+                  name: vehicles-config
+                  key: vehicles-broker-producer-initial-delay
+            - name: BROKER_SCHEDULER_REFRESH_DELAY
+              valueFrom:
+                configMapKeyRef:
+                  name: vehicles-config
+                  key: vehicles-broker-producer-refresh-delay

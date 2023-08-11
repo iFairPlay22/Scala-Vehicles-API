@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vehicles-api-deployment
+  labels:
+    app: vehicles-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: vehicles-api
+  template:
+    metadata:
+      labels:
+        app: vehicles-api
+    spec:
+      containers:
+      - name: vehicles-api
+        image: ewenbouquet/vehicles-api:0.1.0-SNAPSHOT
+        ports:
+        - containerPort: 8080
+        env:
+        - name: API_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: vehicles-config
+              key: vehicles-api-host
+        - name: API_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: vehicles-config
+              key: vehicles-api-port
+        - name: DATABASE_CONTACT_POINT
+          valueFrom:
+            configMapKeyRef:
+              name: vehicles-config
+              key: cassandra-url
+        - name: DATABASE_KEYSPACE
+          valueFrom:
+            configMapKeyRef:
+              name: vehicles-config
+              key: vehicles-api-cassandra-keyspace
+        - name: DATABASE_DATACENTER
+          valueFrom:
+            configMapKeyRef:
+              name: vehicles-config
+              key: cassandra-datacenter
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: vehicles-api-service
+spec:
+  type: NodePort
+  selector:
+    app: vehicles-api
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
+      nodePort: 30000
